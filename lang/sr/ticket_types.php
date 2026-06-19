@@ -1,0 +1,121 @@
+<?php // resources/lang/sr/admin_ticket_types.php
+
+return [
+    'page_title'        => 'Upravljanje Tipovima Ulaznica',
+    'main_heading'      => 'Tipovi Ulaznica',
+    'create_button'     => 'Kreiraj Tip Ulaznice',
+
+    'table' => [
+        'header_name'           => 'Naziv',
+        'header_price'          => 'Cena',
+        'header_photo'          => 'Fotografija',
+        'header_actions'        => 'Akcije',
+
+        'no_photo'              => 'Nema fotografije',
+        'action_edit'           => 'Izmeni',
+        'action_delete'         => 'Obriši',
+        'delete_confirm_message' => 'Da li ste sigurni da želite da obrišete ovaj tip ulaznice? Ova akcija se ne može opozvati.',
+
+        'no_data_message'       => 'Nema pronađenih tipova ulaznica.',
+    ],
+    'form_shared' => [
+        'name_label' => 'Naziv',
+        'name_placeholder' => 'npr., Regularna Ulaznica, VIP Propusnica',
+        'price_label' => 'Cena',
+        'price_placeholder' => '0.00',
+        'photo_label' => 'Slika/Fotografija Ulaznice',
+        'photo_help_text' => 'Opciono. Maksimalna veličina fajla: 2MB. Dozvoljeni tipovi: JPG, PNG, WEBP, GIF, SVG.',
+        'qr_fieldset_legend' => 'Koordinate QR Koda (na slici ulaznice)',
+        'qr_help_text' => 'Definišite X, Y koordinate (u pikselima od gornjeg levog ugla) i veličinu (u pikselima) za postavljanje QR koda.',
+        'qr_x_label' => 'X Koordinata',
+        'qr_x_placeholder' => 'npr., 120',
+        'qr_y_label' => 'Y Koordinata',
+        'qr_y_placeholder' => 'npr., 210',
+        'qr_size_label' => 'Veličina QR (px)',
+        'qr_size_placeholder' => 'npr., 100',
+        'commissions_fieldset_legend' => 'Nivoi Provizije za Ulaznice',
+        'commissions_min_sold_label' => 'Min Prodato',
+        'commissions_min_sold_placeholder' => 'npr., 1',
+        'commissions_max_sold_label' => 'Max Prodato',
+        'commissions_max_sold_placeholder' => 'npr., 10 (prazno za bez ograničenja)',
+        'commissions_amount_label' => 'Iznos Provizije', // Original "Zarada"
+        'commissions_amount_placeholder' => 'npr., 150.00',
+        'commissions_remove_button' => 'Ukloni',
+        'commissions_add_tier_button' => 'Dodaj Nivo Provizije',
+        'cancel_button' => 'Otkaži',
+    ],
+
+    'create_form' => [
+        'page_title' => 'Kreiraj Novi Tip Ulaznice',
+        'main_heading' => 'Kreiraj Novi Tip Ulaznice',
+        'back_to_list_link' => '&larr; Nazad na Listu',
+        'create_button' => 'Kreiraj Tip Ulaznice',
+        'name_label' => 'Naziv',
+        'name_placeholder' => 'npr., Regularna Ulaznica, VIP Propusnica',
+        'price_label' => 'Cena',
+        'price_placeholder' => '0.00',
+        'photo_label' => 'Slika/Fotografija Ulaznice',
+        'photo_help_text' => 'Opciono. Maksimalna veličina fajla: 2MB. Dozvoljeni tipovi: JPG, PNG, WEBP, GIF, SVG.',
+        'qr_fieldset_legend' => 'Koordinate QR Koda (na slici ulaznice)',
+        'qr_help_text' => 'Definišite X, Y koordinate (u pikselima od gornjeg levog ugla) i veličinu (u pikselima) za postavljanje QR koda.',
+        'qr_x_label' => 'X Koordinata',
+        'qr_x_placeholder' => 'npr., 120',
+        'qr_y_label' => 'Y Koordinata',
+        'qr_y_placeholder' => 'npr., 210',
+        'qr_size_label' => 'Veličina QR (px)',
+        'qr_size_placeholder' => 'npr., 100',
+        'commissions_fieldset_legend' => 'Nivoi Provizije za Ulaznice',
+        'commissions_min_sold_label' => 'Min Prodato',
+        'commissions_min_sold_placeholder' => 'npr., 1',
+        'commissions_max_sold_label' => 'Max Prodato',
+        'commissions_max_sold_placeholder' => 'npr., 10 (prazno za bez ograničenja)',
+        'commissions_amount_label' => 'Iznos Provizije', // Original "Zarada"
+        'commissions_amount_placeholder' => 'npr., 150.00',
+        'commissions_remove_button' => 'Ukloni',
+        'commissions_add_tier_button' => 'Dodaj Nivo Provizije',
+        'price_currency_suffix' => 'RSD',
+        'cancel_button' => 'Otkaži',
+    ],
+
+    // Ključevi za stranicu Izmeni Tip Ulaznice
+    'edit_form' => [
+        'page_title'        => 'Izmeni Tip Ulaznice',
+        'main_heading'      => 'Izmeni Tip Ulaznice: :name',
+        'back_to_list_link' => '&larr; Nazad na Listu',
+
+        'name_label'        => 'Naziv',
+        'name_placeholder'  => 'npr., Regularna Ulaznica, VIP Propusnica',
+
+        'price_label'       => 'Cena',
+        'price_currency_suffix' => 'RSD',
+        'price_placeholder' => '0.00',
+
+        'photo_label'       => 'Slika/Fotografija Ulaznice',
+        'current_photo_label' => 'Trenutna Slika:',
+        'no_current_photo'  => 'Nema trenutne slike.',
+        'photo_help_text_edit' => 'Opciono. Otpremite novu sliku da zamenite trenutnu. Maksimalna veličina fajla: 2MB. Dozvoljeni tipovi: JPG, PNG, WEBP, GIF, SVG.',
+
+        'qr_fieldset_legend'    => 'Koordinate QR Koda (na slici ulaznice)',
+        'qr_help_text'          => 'Definišite X, Y koordinate (u pikselima od gornjeg levog ugla) i veličinu (u pikselima) za postavljanje QR koda.',
+        'qr_x_label'            => 'X Koordinata',
+        'qr_x_placeholder'      => 'npr., 120',
+        'qr_y_label'            => 'Y Koordinata',
+        'qr_y_placeholder'      => 'npr., 210',
+        'qr_size_label'         => 'Veličina QR (px)',
+        'qr_size_placeholder'   => 'npr., 100',
+
+        'commissions_fieldset_legend'   => 'Nivoi Provizije za Ulaznice',
+        'commissions_min_sold_label'    => 'Min Prodato',
+        'commissions_min_sold_placeholder' => 'npr., 1',
+        'commissions_max_sold_label'    => 'Max Prodato',
+        'commissions_max_sold_placeholder' => 'npr., 10 (prazno za bez ograničenja)',
+        'commissions_amount_label'      => 'Iznos Provizije',
+        'commissions_amount_placeholder' => 'npr., 150.00',
+        'commissions_remove_button'     => 'Ukloni',
+        'commissions_add_tier_button'   => 'Dodaj Nivo Provizije',
+
+        'cancel_button'     => 'Otkaži',
+        'update_button'     => 'Ažuriraj Tip Ulaznice',
+    ],
+    'currency_symbol'   => 'RSD', // Simbol valute
+];

@@ -1,0 +1,62 @@
+<?php // resources/lang/en/alert.php
+
+return [
+    // Ticket Type Alerts
+    'ticket_type_created_success' => 'Ticket Type created successfully!',
+    'ticket_type_create_failed'   => 'Failed to create Ticket Type. Please try again. Error: :error',
+
+    'ticket_type_updated_success' => 'Ticket Type updated successfully!',
+    'ticket_type_update_failed'   => 'Failed to update Ticket Type. Please try again. Error: :error',
+
+    'ticket_type_deleted_success' => 'Ticket Type deleted successfully!',
+    'ticket_type_delete_failed'   => 'Failed to delete Ticket Type. Error: :error',
+
+    'failed_to_create_directory' => 'Failed to create directory: :error',
+    'failed_to_move_photo'       => 'Failed to move uploaded photo: :error',
+    'update_failed_create_directory' => 'Update failed: Could not create directory: :error',
+    'update_failed_move_photo'       => 'Update failed: Could not move new photo: :error',
+
+    'order_created_success' => 'Order created successfully! Processing initiated for order .',
+    'order_created_failure' => 'Failed to create order due to an internal error: :message',
+    'image_generation_requeued' => 'Image generation for order has been re-queued.',
+    'image_generation_cannot_rerun' => 'Image generation for order cannot be rerun from its current state (:status).',
+    'email_requeued_success' => 'Email for order has been re-queued for sending.',
+    'email_cannot_resent' => 'Email for order cannot be re-sent from its current state (:status).',
+
+    'payment_amount_updated' => 'Payment amount updated.',
+    'ticket_codes_not_found' => 'None of the selected ticket codes were found for this order.',
+    'no_tickets_to_process' => 'No tickets available to process for this order.',
+    'no_qr_codes_found' => 'No QR code images were found for the specified tickets.',
+    'zip_creation_failed' => 'Could not create the ZIP file. Please check server permissions or logs.',
+
+    'promoter_updated_success' => 'Promoter updated successfully!',
+    'auth_required' => 'Authentication required.',
+    'ticket_type_created_success' => 'Ticket Type created successfully!',
+    'ticket_type_create_failed' => 'Failed to create Ticket Type. Please try again. Error: :message',
+    'ticket_type_updated_success' => 'Ticket Type updated successfully!',
+    'ticket_type_update_failed' => 'Failed to update Ticket Type. Error: :message',
+    'ticket_type_deleted_success' => 'Ticket Type deleted successfully!',
+    'ticket_type_delete_failed' => 'Failed to delete Ticket Type. Error: :message',
+
+    'password_update_success' => 'Password updated successfully!',
+    'password_update_failed' => 'Failed to update password. Please try again.',
+    'validation_failed_check_fields' => 'Validation failed. Please check the input fields for errors.',
+
+    /* ---- Festival management ---- */
+    'festival_created'              => 'Festival created successfully.',
+    'festival_updated'              => 'Festival updated successfully.',
+    'festival_deleted'              => 'Festival deleted.',
+    'festival_cannot_delete_active' => 'Only draft festivals can be deleted. Archive it first.',
+    'assignment_added'              => 'User assigned to the festival.',
+    'assignment_removed'            => 'User removed from the festival.',
+
+    /* ---- User management ---- */
+    'user_created'           => 'User created successfully.',
+    'user_updated'           => 'User updated successfully.',
+    'user_deleted'           => 'User deleted.',
+    'user_cannot_delete_self'=> 'You cannot delete your own account.',
+
+    /* ---- Authorization ---- */
+    'no_festival_access'     => 'You do not have access to this festival.',
+    'role_unauthorized'      => 'You are not authorized to perform this action.',
+];
