@@ -25,6 +25,7 @@
 6. [Roles & Permissions](#roles--permissions)
 7. [Order Lifecycle](#order-lifecycle)
 8. [Commission Engine](#commission-engine)
+8a. [Mail Templates](#mail-templates)
 9. [Real-time Updates (Reverb)](#real-time-updates-reverb)
 10. [Project Structure](#project-structure)
 11. [Installation](#installation)
@@ -78,6 +79,9 @@ responsive while hundreds of ticket images are being rendered.
 - **Bilingual UI** — English (`en`) + Serbian Cyrillic (`sr`).
 - **Livewire Volt / Flux** — Modern stack on top of Laravel's full-stack
   ecosystem.
+- **Dynamic mail-template editor** — Edit the HTML + CSS of every transactional
+  email in the browser, with a live preview, version history and per-festival
+  overrides. See [Mail Templates](#mail-templates) below.
 - **Landing page** — Interactive Three.js / WebGL scene replacing the old
   single-image splash.
 
@@ -311,6 +315,81 @@ are global).
 5. Update the `Ticket` model with `image_path` and `qr_code_path`.
 6. On any failure the order is moved to `failed` and
    `NotifyUserOfFailedImageGeneration` listener sends an admin notification.
+
+---
+
+## Mail Templates
+
+Every transactional email is rendered through a pluggable template system
+that lets non-developers (festival admins, superadmins) change the look and
+feel without touching code.
+
+### What you can edit
+
+- **HTML body** — full HTML + Blade. Insert `{{ $order_number }}`,
+  `{{ $festival_name }}`, `{{ $customer_email }}` and friends.
+- **CSS** — a separate block that gets inlined into the email's `<style>`
+  tag (handy for responsive / Outlook-safe CSS).
+- **Subject** — supports `{{ $festival_name }}` placeholders.
+- **From name / address** — override the global `MAIL_FROM_*` for this
+  template (handy when one festival wants `tickets@refest.rs` and another
+  wants `karte@lovefest.rs`).
+- **Active toggle** — temporarily turn a template off without deleting it.
+
+### Two-tier scoping
+
+Templates live in the `mail_templates` table with two flavours:
+
+- **Global default** (`festival_id IS NULL`) — fallback for every festival.
+- **Festival-scoped** (`festival_id` set) — overrides the global for that
+  festival only.
+
+Resolution at send time:
+
+```
+1. festival-scoped row (key matches, is_active = true)
+        ↓ (miss)
+2. global row       (key matches, is_active = true)
+        ↓ (miss)
+3. built-in Blade view  (resources/views/emails/<key>.blade.php)
+```
+
+### Where to find the editor
+
+- **Superadmin**: sidebar → *Mail templates*. Sees every template.
+- **Festival admin**: in a festival, sidebar → *Mail templates*. Can only
+  edit/create overrides for that festival.
+- **Promoter / sub-promoter**: no access (read-only consumers of mail).
+
+### Available variables
+
+The editor surfaces a clickable catalogue of every placeholder you can use:
+
+| Category    | Examples                                                  |
+| ----------- | --------------------------------------------------------- |
+| Order       | `$order`, `$order_number`, `$order_total`, `$order_status` |
+| Customer    | `$customer_name`, `$customer_email`                        |
+| Festival    | `$festival`, `$festival_name`, `$festival_logo_url`, `$festival_primary_color` |
+| Tickets     | `$tickets`, `$ticket_count`, `$first_ticket_image_url`    |
+| Promoter    | `$promoter`, `$promoter_name`, `$promoter_email`          |
+| App-wide    | `$app_name`, `$support_email`, `$year`                    |
+
+### How the preview works
+
+- Every keystroke in the HTML/CSS textareas re-renders the iframe on the
+  right (Livewire `wire:model.live.debounce.500ms`).
+- The preview uses a synthetic order built from the *current* festival so
+  the festival brand colors, name, location etc. are accurate.
+- Blade compile errors are caught and shown inline as `<!-- template
+  error: ... -->` so the editor never 500s.
+
+### Built-in fallback
+
+The original email template lives at
+`resources/views/emails/customer/tickets.blade.php` and is also the
+*default* global template — it is seeded into `mail_templates` on the
+first `db:seed`. If you delete every row for a key, the system falls back
+to this view, so mails never break.
 
 ---
 
