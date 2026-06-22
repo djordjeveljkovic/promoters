@@ -47,7 +47,29 @@
 - [ ] P-060 Notifications center
 - [ ] P-063 Financial reports
 
-## Recently shipped (since last audit)
+## Recently shipped (since last audit — 2026-06-22)
+- [x] **B-001 Admin can create orders** ✅ — `AdminOrderController::create/store` implemented; admin order form posts to `admin.orders.store`.
+- [x] **B-002 Admin order detail has rerun/email/print buttons** ✅ — added the same buttons the promoter show page has, plus a stats card.
+- [x] **B-003 Festival colour NOT NULL fallback** ✅ — `normaliseColor(null)` no longer forces a NULL into the column.
+- [x] **B-005 `downloadQRCodes` checks festival scope** ✅ — added the defensive check.
+- [x] **B-006 Order create route pluralised** ✅ — `/orders/create` redirects to `/order/create`.
+- [x] **Implicit binding for `{festival}`** ✅ — `Route::bind('festival')` resolves by id or slug; `Festival::__toString` returns the slug so route() helpers never break.
+- [x] **Listener auto-queue serialization fix** ✅ — `NotifyUserOfFailedImageGeneration` is now synchronous (was ShouldQueue) to fix the chain-dispatch "Serialization of Closure" error.
+- [x] **Bus::chain wrapped in try/catch in both order controllers** ✅ — a job-dispatch failure no longer rolls back a successful order.
+- [x] **Serbian pagination + passwords translations** ✅ — `lang/sr/pagination.php`, `lang/sr/passwords.php`.
+- [x] **Dead code moved to `_deprecated/`** ✅ — `OrderController1.php` → `docs/_deprecated/`; `SetLocaleMiddleware.php` → `app/Http/Middleware/_deprecated/`.
+- [x] **Regression tests** ✅ — `tests/Feature/AdminOrderCreateTest.php`, `tests/Feature/FestivalColorFallbackTest.php`.
+
+## Recently shipped (2026-06-22 — second audit)
+- [x] **U-004 Mail template editor surfaces promoter / admin templates** ✅ — added `promoter.new_order`, `admin.daily_summary`, `admin.image_generation_failed` keys.
+- [x] **U-005 Promoter avatar upload** ✅ — added file upload to the admin promoter-edit form, controller moves the file to `public/img/promoter_avatars/`.
+- [x] **U-007 "Resend last 5" on promoter dashboard** ✅ — added the action button next to "New order".
+- [x] **M-005 N+1 in `AdminController::promoters()`** ✅ — replaced per-promoter loops with a single grouped aggregate.
+- [x] **M-011 Explicit route binding for `{festival}`** ✅ — slugs resolve everywhere.
+- [x] **B-011 Festival `__toString` returns slug** ✅ — route generators that interpolate the model get a stable URL.
+- [x] **M-001 Serbian pagination + passwords** ✅ — already done in first pass.
+
+## Previously shipped (since last audit)
 
 - [x] **P-072 Language switcher** ✅ — Livewire component in sidebar + auth pages, session-persisted, `SetLocale` middleware honors `?lang=` / `Accept-Language`.
 - [x] **P-069 Global search** ✅ — Livewire component (debounced 250 ms) over festivals/promoters/orders/ticket-types, scoped to accessible festivals, top-bar wired on every page.

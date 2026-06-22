@@ -3,11 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\GenerateTicketImagesJob;
+use App\Jobs\OrderCompleted;
 use App\Jobs\SendCustomerTicketsEmailJob;
+use App\Models\Ticket;
 use App\Models\TicketOrder;
+use App\Models\TicketOrderItem;
+use App\Models\TicketType;
+use App\Models\User;
 use App\Models\Festival;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use ZipArchive;
 use Illuminate\Support\Facades\Storage;
 
@@ -87,18 +97,195 @@ class AdminOrderController extends Controller
 
     /**
      * Show the form for creating a new resource.
+     *
+     * BUG-B-001 fix: previously this method was empty and the form
+     * posted straight to `promoter.orders.store`, which means admin
+     * orders were created with the admin's role as `requested_by`
+     * (i.e. looked like a promoter sale).  We now reuse the same
+     * ticket-type picker that the promoter create page uses.
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        /** @var Festival $festival */
+        $festival = $request->attributes->get('festival');
+
+        $ticketTypes = $festival
+            ? $festival->ticketTypes()->orderBy('name')->get()
+            : TicketType::orderBy('name')->get();
+
+        return view('pages.admin.orders.create', compact('ticketTypes', 'festival'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created order in storage.
+     *
+     * BUG-B-001 fix: admin-side `store()` was empty (a stub left over
+     * from the multi-festival refactor).  We now mirror the promoter
+     * order creation flow so admins can place orders on behalf of
+     * customers without impersonating a promoter.
      */
     public function store(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+            'email' => 'required|email|max:255',
+            'items' => 'required|array|min:1',
+            'items.*.ticket_type_id' => 'required|exists:ticket_types,id',
+            'items.*.quantity' => 'required|integer|min:1',
+        ], [
+            'items.required' => 'Please add at least one ticket type to the order.',
+            'items.min' => 'Please add at least one ticket type to the order.',
+        ]);
+
+        /** @var Festival $festival */
+        $festival = $request->attributes->get('festival');
+
+        if ($festival) {
+            $validIds = $festival->ticketTypes()->pluck('id')->all();
+            foreach ($validatedData['items'] as $item) {
+                if (!in_array($item['ticket_type_id'], $validIds, true)) {
+                    return back()->withErrors([
+                        'items' => 'Selected ticket type does not belong to this festival.',
+                    ])->withInput();
+                }
+            }
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $customerUser = User::firstOrCreate(
+                ['email' => $validatedData['email']],
+                [
+                    'name'     => Str::before($validatedData['email'], '@'),
+                    'password' => Hash::make(Str::random(16)),
+                    'role'     => 'buyer',
+                ]
+            );
+
+            $adminUser = Auth::user();
+            if (!$adminUser) {
+                throw new \Exception('Admin not authenticated.');
+            }
+
+            $ticketOrder = TicketOrder::create([
+                'festival_id'   => $festival?->id,
+                'order_number'  => $this->generateUniqueCrypticOrderNumber(),
+                'ordered_by'    => $customerUser->id,
+                'requested_by'  => $adminUser->id,
+                'email'         => $validatedData['email'],
+                'job_status'    => 'processing',
+                'paid'          => 0.00,
+                'total'         => 0.00,
+            ]);
+
+            $ticketTypes = TicketType::findMany(
+                collect($validatedData['items'])->pluck('ticket_type_id')->unique()
+            )->keyBy('id');
+
+            $orderTotal = 0.00;
+
+            foreach ($validatedData['items'] as $itemData) {
+                $ticketType = $ticketTypes->get($itemData['ticket_type_id']);
+                if (!$ticketType) {
+                    throw new \Exception('Invalid ticket type ID: ' . $itemData['ticket_type_id']);
+                }
+
+                TicketOrderItem::create([
+                    'festival_id'     => $festival?->id,
+                    'ticket_order_id' => $ticketOrder->id,
+                    'ticket_type_id'  => $itemData['ticket_type_id'],
+                    'quantity'        => $itemData['quantity'],
+                    'price_at_order'  => $ticketType->price,
+                ]);
+
+                for ($i = 0; $i < $itemData['quantity']; $i++) {
+                    Ticket::create([
+                        'festival_id'     => $festival?->id,
+                        'code'            => Str::uuid()->toString(),
+                        'ticket_type_id'  => $itemData['ticket_type_id'],
+                        'ticket_order_id' => $ticketOrder->id,
+                        'is_active'       => true,
+                    ]);
+                }
+
+                $orderTotal += $itemData['quantity'] * $ticketType->price;
+            }
+
+            $ticketOrder->total = $orderTotal;
+            $ticketOrder->save();
+
+            DB::commit();
+
+            // Dispatch the chain in a try/catch so a job-dispatch
+            // failure (e.g. missing public storage in test env) doesn't
+            // roll back an otherwise-successful order creation.  The user
+            // can always rerun the chain from the order detail page.
+            try {
+                Bus::chain([
+                    new GenerateTicketImagesJob($ticketOrder->id),
+                    new SendCustomerTicketsEmailJob($ticketOrder->id, $validatedData['email']),
+                    new OrderCompleted($ticketOrder),
+                ])->dispatch();
+            } catch (\Throwable $chainErr) {
+                Log::warning('AdminOrderController@store - chain dispatch failed: ' . $chainErr->getMessage(), [
+                    'order_id' => $ticketOrder->id,
+                ]);
+            }
+
+            // Build the redirect URL safely — `route()` throws if the festival
+            // param is null, so fall back to the orders index when the
+            // festival context wasn't set (defensive: should never happen
+            // because EnsureFestivalAccess short-circuits earlier).
+            $redirectParams = ['order' => $ticketOrder->id];
+            if ($festival) {
+                $redirectParams['festival'] = $festival->slug ?? $festival->id;
+            }
+            try {
+                return redirect()
+                    ->route('admin.orders.show', $redirectParams)
+                    ->with('success', __('alert.order_created_success', ['orderId' => $ticketOrder->id]));
+            } catch (\Throwable $routeErr) {
+                Log::warning('AdminOrderController@store - admin.orders.show route failed: ' . $routeErr->getMessage());
+                return redirect()
+                    ->route('admin.orders.index', $redirectParams)
+                    ->with('success', __('alert.order_created_success', ['orderId' => $ticketOrder->id]));
+            }
+        } catch (\Exception $e) {
+            // Roll back the order creation only — the chain dispatch is
+            // wrapped in its own try/catch above, so by the time we get
+            // here we know the order itself failed.
+            try { DB::rollBack(); } catch (\Throwable $_) {}
+            Log::error('AdminOrderController@store - Order creation failed: ' . $e->getMessage(), [
+                'request' => $request->except(['password', '_token']),
+                'trace_snippet' => substr($e->getTraceAsString(), 0, 1000),
+            ]);
+            return back()->withInput()->with('error', __('alert.order_created_failure', ['message' => $e->getMessage()]));
+        }
+    }
+
+    /**
+     * Generates a 6-character alpha order number, unique across `ticket_orders`.
+     * Mirrors the same routine on OrderController — keeping them duplicated
+     * is preferable to forcing a service-layer indirection for what is
+     * effectively a one-liner.
+     */
+    private function generateUniqueCrypticOrderNumber(int $length = 6): string
+    {
+        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+
+        do {
+            $currentRandomString = '';
+            for ($i = 0; $i < $length; $i++) {
+                try {
+                    $currentRandomString .= $characters[random_int(0, $charactersLength - 1)];
+                } catch (\Exception $e) {
+                    $currentRandomString .= $characters[mt_rand(0, $charactersLength - 1)];
+                }
+            }
+        } while (DB::table('ticket_orders')->where('order_number', $currentRandomString)->exists());
+
+        return $currentRandomString;
     }
 
 
@@ -116,6 +303,15 @@ class AdminOrderController extends Controller
 
     public function downloadQRCodes(Request $request, TicketOrder $order)
     {
+        // B-005: this action lives behind the festival-scope middleware,
+        // but the route is also referenced from the Livewire admin show
+        // view which passes raw festival_id.  Defensively check that the
+        // order belongs to the festival in scope so a stray id mismatch
+        // doesn't leak tickets across festivals.
+        $festival = $request->attributes->get('festival');
+        if ($festival instanceof Festival && $order->festival_id !== $festival->id) {
+            abort(403, __('alert.role_unauthorized'));
+        }
         $zip = new ZipArchive();
         $fileName = 'qrcodes_order_' . $order->id . '.zip';
 

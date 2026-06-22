@@ -45,7 +45,67 @@
         </x-slot:body>
     </x-ds.card>
 
-    {{-- Filter --}}
+    {{-- U-008: stats summary card mirroring the promoter show page. --}}
+<x-ds.card>
+    <x-slot:body>
+        <dl class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+                <dt class="text-[10px] uppercase tracking-wider text-[color:var(--ds-text-muted)] font-semibold">{{ __('Total') }}</dt>
+                <dd class="text-base font-semibold num mt-0.5">{{ number_format((float) ($order->total ?: $totalPrice), 0, ',', '.') }} RSD</dd>
+            </div>
+            <div>
+                <dt class="text-[10px] uppercase tracking-wider text-[color:var(--ds-text-muted)] font-semibold">{{ __('Paid') }}</dt>
+                <dd class="text-base font-semibold num mt-0.5">{{ number_format((float) $order->paid, 0, ',', '.') }} RSD</dd>
+            </div>
+            <div>
+                <dt class="text-[10px] uppercase tracking-wider text-[color:var(--ds-text-muted)] font-semibold">{{ __('Commission') }}</dt>
+                <dd class="text-base font-semibold num mt-0.5">
+                    @if (in_array($order->job_status, ['completed', 'sent']) && isset($order->total_commission_earned))
+                        {{ number_format((float) $order->total_commission_earned, 0, ',', '.') }} RSD
+                    @else
+                        <span class="text-xs text-[color:var(--ds-text-subtle)]">—</span>
+                    @endif
+                </dd>
+            </div>
+            <div>
+                <dt class="text-[10px] uppercase tracking-wider text-[color:var(--ds-text-muted)] font-semibold">{{ __('Tickets') }}</dt>
+                <dd class="text-base font-semibold num mt-0.5">{{ $order->tickets->count() }}</dd>
+            </div>
+        </dl>
+    </x-slot:body>
+</x-ds.card>
+
+{{-- B-002: missing rerun/email actions the promoter show has. Inline the same
+     buttons here so the admin can recover from image-generation or email
+     failures without leaving the page. --}}
+@php
+    $statusKey = $order->job_status;
+    $canRerunImages = in_array($statusKey, ['failed', 'pending', 'processing', 'blocked'], true);
+    $canRerunEmail  = in_array($statusKey, ['failed', 'completed', 'sent', 'processing'], true);
+    $festivalSlugForActions = $order->festival?->slug ?? $order->festival_id;
+@endphp
+<div class="flex flex-wrap items-center gap-2">
+    @if ($canRerunImages)
+        <form method="POST" action="{{ route('admin.orders.rerun-image-generation', ['festival' => $festivalSlugForActions, 'order' => $order->id]) }}">
+            @csrf
+            <x-ds.button variant="ghost" size="sm" type="submit" title="{{ __('Re-run image generation') }}">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><polyline points="3 21 3 16 8 16"/></svg>
+                {{ __('Re-run images') }}
+            </x-ds.button>
+        </form>
+    @endif
+    @if ($canRerunEmail)
+        <form method="POST" action="{{ route('admin.orders.rerun-email-sending', ['festival' => $festivalSlugForActions, 'order' => $order->id]) }}">
+            @csrf
+            <x-ds.button variant="primary" size="sm" type="submit" title="{{ __('Resend the customer email') }}">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>
+                {{ __('Resend email') }}
+            </x-ds.button>
+        </form>
+    @endif
+</div>
+
+{{-- Filter --}}
     <x-ds.field :label="__('order_details.filter.label')" name="ticketTypeFilter">
         <select wire:model.live="ticketTypeFilter" id="ticketTypeFilter" class="ds-select" style="max-width: 280px;">
             <option value="all">{{ __('order_details.filter.all_types_option') }}</option>
@@ -131,7 +191,8 @@
         <x-ds.card :title="__('order_details.actions.group_title')">
             <x-slot:body>
                 <div class="flex flex-wrap items-center gap-2">
-                    <form method="POST" action="{{ route('admin.orders.downloadQRCodes', ['festival' => $order->festival_id, 'order' => $order->id]) }}">
+                    @php $dlSlug = $order->festival?->slug ?? $order->festival_id; @endphp
+                    <form method="POST" action="{{ route('admin.orders.downloadQRCodes', ['festival' => $dlSlug, 'order' => $order->id]) }}">
                         @csrf
                         @foreach($selectedCodes as $code)
                             <input type="hidden" name="selected_codes[]" value="{{ $code }}">
@@ -141,7 +202,7 @@
                         </x-ds.button>
                     </form>
 
-                    <form method="POST" action="{{ route('admin.orders.downloadQRCodes', ['festival' => $order->festival_id, 'order' => $order->id]) }}">
+                    <form method="POST" action="{{ route('admin.orders.downloadQRCodes', ['festival' => $dlSlug, 'order' => $order->id]) }}">
                         @csrf
                         <x-ds.button variant="secondary" size="sm" type="submit">
                             {{ __('order_details.actions.download_all_button') }}

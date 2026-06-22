@@ -40,6 +40,9 @@ return [
         'bio_label'             => 'Short bio',
         'bio_help_text'         => 'Up to 500 characters. Plain text only.',
         'bio_placeholder'       => 'A short introduction — what kind of events do you sell for?',
+        // U-005: avatar upload
+        'avatar_label'          => 'Avatar photo',
+        'avatar_help_text'      => 'Square JPG/PNG/WebP up to 1 MB. Shown on the public profile.',
     ],
     // Short keys used by the promoter edit page header.
     'edit' => [

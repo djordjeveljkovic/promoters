@@ -9,7 +9,7 @@
     </x-ds.page-header>
 
     <x-ds.card class="max-w-3xl">
-        <form method="POST" action="{{ route('promoter.orders.store', $festival) }}" id="createOrderForm" class="space-y-5">
+        <form method="POST" action="{{ route('admin.orders.store', $festival) }}" id="createOrderForm" class="space-y-5">
             @csrf
 
             <x-ds.field :label="__('Customer Email')" name="email" :required="true" :error="$errors->first('email')">

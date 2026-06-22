@@ -333,8 +333,41 @@ class Editor extends Component
     private function starterHtml(string $key, ?Festival $festival): string
     {
         $fName = $festival?->displayName() ?? 'festival';
-        return <<<HTML
-<h1 style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; color: {$this->brandColor($festival)};">
+        $brand = $this->brandColor($festival);
+
+        return match ($key) {
+            'promoter.new_order' => <<<HTML
+<h1 style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; color: {$brand};">
+    New order received
+</h1>
+<p>Hi {{ \$promoter_name ?? 'promoter' }},</p>
+<p>An order was just placed on <strong>{{ \$festival_name ?? '{$fName}' }}</strong>:</p>
+<ul>
+    <li>Order #{{ \$order_number ?? '—' }} ({{ \$order_total ?? '—' }})</li>
+    <li>Customer: {{ \$customer_email ?? '—' }}</li>
+    <li>Tickets: {{ \$ticket_count ?? 0 }}</li>
+</ul>
+<p>— {{ \$app_name ?? 'Promoteri' }}</p>
+HTML,
+            'admin.daily_summary' => <<<HTML
+<h1 style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; color: {$brand};">
+    Daily summary
+</h1>
+<p>Hi admin,</p>
+<p>Here's the day at a glance for <strong>{{ \$festival_name ?? '{$fName}' }}</strong>:</p>
+<p>Orders: {{ \$order_count ?? 0 }} — Revenue: {{ \$order_total ?? '0.00' }}</p>
+<p>— {{ \$app_name ?? 'Promoteri' }}</p>
+HTML,
+            'admin.image_generation_failed' => <<<HTML
+<h1 style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; color: #dc2626;">
+    Image generation failed
+</h1>
+<p>An image-generation job failed for order #{{ \$order_number ?? '—' }} on <strong>{{ \$festival_name ?? '{$fName}' }}</strong>.</p>
+<p>Reason: {{ \$error_message ?? 'unknown' }}</p>
+<p>Open the order and click "Re-run images" to retry.</p>
+HTML,
+            default => <<<HTML
+<h1 style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; color: {$brand};">
     Hvala na kupovini!
 </h1>
 <p>Poštovani {{ \$customer_name ?? 'kupac' }},</p>
@@ -345,7 +378,8 @@ class Editor extends Component
 @endif
 
 <p>— {{ \$app_name ?? 'REFEST Festival' }}</p>
-HTML;
+HTML,
+        };
     }
 
     private function brandColor(?Festival $f): string
@@ -370,8 +404,16 @@ HTML;
     #[Computed]
     public function templateKeys(): array
     {
+        // P-051 / U-004: surface every kind of transactional email the
+        // platform can send so admins can override any of them.  The
+        // actual send paths may not exist for every key yet — the
+        // editor will still let the admin save a template for future
+        // use, and we seed sensible defaults via the renderer.
         return [
-            'customer.tickets' => 'Customer — Tickets delivery',
+            'customer.tickets'            => 'Customer — Tickets delivery',
+            'promoter.new_order'           => 'Promoter — New order notification',
+            'admin.daily_summary'          => 'Admin — Daily summary',
+            'admin.image_generation_failed' => 'Admin — Ticket-image generation failed',
         ];
     }
 

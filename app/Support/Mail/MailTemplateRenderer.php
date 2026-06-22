@@ -257,9 +257,12 @@ HTML;
     {
         $name = $festival?->displayName() ?? 'festival';
         return match ($key) {
-            'customer.tickets' => "Vaše ulaznice za {$name}",
-            'order.completed'  => "Porudžbina #" . ($festival?->id ?? '') . " je završena",
-            default            => Str::headline($key),
+            'customer.tickets'             => "Vaše ulaznice za {$name}",
+            'promoter.new_order'            => "New order received for {$name}",
+            'admin.daily_summary'           => "Daily summary for {$name}",
+            'admin.image_generation_failed' => "Image-generation failed on {$name}",
+            'order.completed'               => "Porudžbina #" . ($festival?->id ?? '') . " je završena",
+            default                        => Str::headline($key),
         };
     }
 

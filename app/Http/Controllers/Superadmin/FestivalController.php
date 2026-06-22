@@ -58,8 +58,16 @@ class FestivalController extends Controller
     public function store(Request $request)
     {
         $data = $this->validated($request);
-        $data['primary_color']   = Festival::normaliseColor($data['primary_color'] ?? null);
-        $data['secondary_color'] = Festival::normaliseColor($data['secondary_color'] ?? null);
+        // B-003: the columns are NOT NULL in the migration, so we must NOT
+        // overwrite them with an explicit null.  Only assign when the
+        // normalised value is a valid colour; otherwise let the column
+        // default kick in.
+        $primary = Festival::normaliseColor($data['primary_color'] ?? null);
+        $secondary = Festival::normaliseColor($data['secondary_color'] ?? null);
+        if ($primary)   $data['primary_color']   = $primary;
+        else            unset($data['primary_color']);
+        if ($secondary) $data['secondary_color'] = $secondary;
+        else            unset($data['secondary_color']);
 
         DB::transaction(function () use ($data, $request) {
             if ($request->hasFile('logo')) {
@@ -83,8 +91,14 @@ class FestivalController extends Controller
     public function update(Request $request, Festival $festival)
     {
         $data = $this->validated($request, $festival);
-        $data['primary_color']   = Festival::normaliseColor($data['primary_color'] ?? null);
-        $data['secondary_color'] = Festival::normaliseColor($data['secondary_color'] ?? null);
+        // B-003: see note in store() — preserve the column default when
+        // the admin submits an empty value.
+        $primary = Festival::normaliseColor($data['primary_color'] ?? null);
+        $secondary = Festival::normaliseColor($data['secondary_color'] ?? null);
+        if ($primary)   $data['primary_color']   = $primary;
+        else            unset($data['primary_color']);
+        if ($secondary) $data['secondary_color'] = $secondary;
+        else            unset($data['secondary_color']);
 
         DB::transaction(function () use ($data, $request, $festival) {
             if ($request->hasFile('logo')) {

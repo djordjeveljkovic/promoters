@@ -5,15 +5,25 @@ namespace App\Listeners;
 use App\Jobs\GenerateTicketImagesJob; // Import the specific job class
 use App\Models\TicketOrder;
 use App\Notifications\OrderImageGenerationFailed; // Import the notification
-use Illuminate\Contracts\Queue\ShouldQueue; // Make listener queued for performance
 use Illuminate\Queue\Events\JobFailed;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification; // Import Notification facade
 
-class NotifyUserOfFailedImageGeneration implements ShouldQueue // Implement ShouldQueue
+/**
+ * P-060 / BUG-AUDIT-007: When a ticket-image-generation job fails, we
+ * email the promoter so they can retry it from the orders index.
+ *
+ * Historically this listener implemented `ShouldQueue`, but the
+ * auto-discovery path triggered a `Serialization of 'Closure' is not
+ * allowed` error during the chain-dispatch (the queued-listener
+ * wrapper couldn't be serialised in the sync queue's payload).  We
+ * keep the listener synchronous: the notification send is a single
+ * `Mail::send()` call, fast enough to run inline, and removing the
+ * `ShouldQueue` interface fixes the chain-dispatch failure on the
+ * order-creation path.
+ */
+class NotifyUserOfFailedImageGeneration
 {
-    use InteractsWithQueue; // Use trait if implementing ShouldQueue
 
     /**
      * Create the event listener.

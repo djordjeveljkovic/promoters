@@ -11,7 +11,7 @@
     </x-ds.page-header>
 
     <x-ds.card class="max-w-2xl">
-        <form method="POST" action="{{ route('admin.promoters.update', ['festival' => $festival->slug, 'id' => $promoter->id]) }}" class="space-y-5">
+        <form method="POST" action="{{ route('admin.promoters.update', ['festival' => $festival->slug, 'id' => $promoter->id]) }}" enctype="multipart/form-data" class="space-y-5">
             @csrf
             @method('PUT')
 
@@ -39,6 +39,18 @@
                         <span class="block text-xs text-[color:var(--ds-text-muted)]">{{ __('promoters.edit_form.public_help_text') }}</span>
                     </span>
                 </label>
+
+                {{-- U-005: avatar upload --}}
+                <x-ds.field :label="__('promoters.edit_form.avatar_label')" name="avatar" :hint="__('promoters.edit_form.avatar_help_text')" :error="$errors->first('avatar')">
+                    @if (!empty($promoter->avatar_path))
+                        <div class="mb-2 flex items-center gap-3">
+                            <img src="{{ asset($promoter->avatar_path) }}" alt="{{ $promoter->name }}" class="h-14 w-14 rounded-full object-cover border border-[color:var(--ds-border)]">
+                            <span class="text-xs text-[color:var(--ds-text-muted)]">{{ basename($promoter->avatar_path) }}</span>
+                        </div>
+                    @endif
+                    <input type="file" name="avatar" accept="image/jpeg,image/png,image/webp" class="block w-full text-sm text-[color:var(--ds-text)] border border-[color:var(--ds-border)] rounded-lg bg-[color:var(--ds-surface)] file:mr-3 file:py-2 file:px-4 file:rounded-l-md file:border-0 file:text-sm file:font-medium file:bg-[color:var(--ds-accent-soft)] file:text-[color:var(--ds-accent-text)] hover:file:bg-[color:var(--ds-accent-soft-2)]">
+                </x-ds.field>
+
                 <x-ds.field :label="__('promoters.edit_form.bio_label')" name="bio" :hint="__('promoters.edit_form.bio_help_text')" :error="$errors->first('bio')">
                     <textarea name="bio" rows="3" maxlength="500" class="ds-textarea" placeholder="{{ __('promoters.edit_form.bio_placeholder') }}">{{ old('bio', $promoter->bio) }}</textarea>
                 </x-ds.field>

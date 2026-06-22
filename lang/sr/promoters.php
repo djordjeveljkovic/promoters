@@ -45,6 +45,9 @@ return [
         'bio_label'             => 'Kratka biografija',
         'bio_help_text'         => 'Do 500 karaktera. Čist tekst.',
         'bio_placeholder'       => 'Kratka prezentacija — za koje vrste događaja prodajete karte?',
+        // U-005: avatar upload
+        'avatar_label'          => 'Profilna slika',
+        'avatar_help_text'      => 'Kvadratni JPG/PNG/WebP do 1 MB. Prikazuje se na javnom profilu.',
     ],
     // Short keys used by the promoter edit page header.
     'edit' => [

@@ -251,40 +251,55 @@ class AdminController extends Controller
         }
         $promoters = $query->get();
 
-        // Define successful sale statuses once
-        $successfulSaleStatuses = ['completed', 'confirmed']; // Or your actual statuses
+        // 2. Single aggregate query per promoter to avoid N+1 (M-005).
+        //    We compute gross + commission + tickets in one SQL statement
+        //    grouped by `requested_by`.
+        $successfulSaleStatuses = ['completed', 'sent'];
+        $promoterIds = $promoters->pluck('id')->all();
 
-        // 2. Iterate through each promoter to calculate and attach their financial data
-        foreach ($promoters as $promoter) {
-            $promoterId = $promoter->id; // Get the ID of the current promoter in the loop
+        $stats = collect();
+        if (!empty($promoterIds)) {
+            $rows = DB::table('ticket_orders')
+                ->selectRaw('
+                    requested_by,
+                    COALESCE(SUM(total), 0) AS gross,
+                    COALESCE(SUM(total_commission_earned), 0) AS commission,
+                    COALESCE(SUM(items_count), 0) AS tickets
+                ')
+                ->selectRaw('COUNT(*) AS orders_count')
+                ->whereIn('requested_by', $promoterIds)
+                ->whereIn('job_status', $successfulSaleStatuses)
+                ->when($festival, fn ($q) => $q->where('festival_id', $festival->id))
+                ->leftJoinSub(
+                    DB::table('ticket_order_items')
+                        ->selectRaw('ticket_order_id, SUM(quantity) AS items_count')
+                        ->groupBy('ticket_order_id'),
+                    'items',
+                    'ticket_orders.id',
+                    '=',
+                    'items.ticket_order_id'
+                )
+                ->groupBy('requested_by')
+                ->get();
 
-            $ordersQuery = TicketOrder::where('requested_by', $promoterId)
-                ->whereIn('job_status', $successfulSaleStatuses);
-            if ($festival) {
-                $ordersQuery->where('festival_id', $festival->id);
-            }
-
-            // a. Total Commission Earned by Promoter (All Time)
-            $promoter->totalCommissionEarned = (clone $ordersQuery)->sum('total_commission_earned');
-
-            // b. Gross Value of Tickets Sold by Promoter (All Time)
-            $promoter->grossSalesAllTime = (clone $ordersQuery)->sum('total');
-
-            // c. Amount Already Paid by Promoter to Organizers
-            // Assumes 'paid' is a field on your User (promoter) model or you fetch it similarly
-            $promoter->amountPaidToOrganizers = $promoter->paid ?? 0.00;
-
-            // d. Amount Owed by Promoter to Organizers
-            $promoter->amountOwedToOrganizers = $promoter->grossSalesAllTime - $promoter->amountPaidToOrganizers - $promoter->totalCommissionEarned;
-
-            // e. How much promoter made for organizers
-            $promoter->madeForOrganizers = $promoter->grossSalesAllTime - $promoter->totalCommissionEarned;
-
-            // f. How many tickets sold (count of orders)
-            $promoter->ticketsSoldCount = (clone $ordersQuery)->count();
+            $stats = $rows->keyBy('requested_by');
         }
 
-        // 3. Pass the collection of promoters (now with added financial data) to the view
+        // 3. Attach stats to each promoter model.
+        foreach ($promoters as $promoter) {
+            $row = $stats->get($promoter->id);
+            $gross = (float) ($row->gross ?? 0);
+            $commission = (float) ($row->commission ?? 0);
+
+            $promoter->totalCommissionEarned    = $commission;
+            $promoter->grossSalesAllTime         = $gross;
+            $promoter->madeForOrganizers         = $gross - $commission;
+            $promoter->ticketsSoldCount          = (int) ($row->tickets ?? 0);
+            $promoter->ordersCount               = (int) ($row->orders_count ?? 0);
+            $promoter->amountPaidToOrganizers    = (float) ($promoter->paid ?? 0);
+            $promoter->amountOwedToOrganizers    = $gross - $promoter->amountPaidToOrganizers - $commission;
+        }
+
         return view('pages.admin.promoters.index', compact('promoters', 'festival'));
     }
 
@@ -376,6 +391,8 @@ class AdminController extends Controller
             // P-070: public profile fields.
             'is_public' => 'nullable|boolean',
             'bio'       => 'nullable|string|max:500',
+            // U-005: avatar upload (optional).
+            'avatar'    => 'nullable|image|mimes:jpeg,png,jpg,webp|max:1024',
         ]);
 
         $promoter->name = $validatedData['name'];
@@ -386,6 +403,23 @@ class AdminController extends Controller
 
         if (!empty($validatedData['password'])) {
             $promoter->password = Hash::make($validatedData['password']);
+        }
+
+        // U-005: avatar upload.
+        if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
+            $file = $request->file('avatar');
+            $dir = public_path('img/promoter_avatars');
+            if (!is_dir($dir)) {
+                mkdir($dir, 0775, true);
+            }
+            $name = 'u' . $promoter->id . '_' . $file->hashName();
+            $file->move($dir, $name);
+
+            // Delete the previous avatar file (best effort).
+            if ($promoter->avatar_path && file_exists(public_path($promoter->avatar_path))) {
+                @unlink(public_path($promoter->avatar_path));
+            }
+            $promoter->avatar_path = 'img/promoter_avatars/' . $name;
         }
 
         $promoter->save();

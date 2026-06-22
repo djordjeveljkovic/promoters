@@ -224,16 +224,26 @@ class OrderController extends Controller
             DB::commit();
 
             Log::info("Order {$ticketOrder->id} created by promoter {$promoterUser->id}. Dispatching job chain.");
-            Bus::chain([
-                new GenerateTicketImagesJob($ticketOrder->id),
-                new SendCustomerTicketsEmailJob($ticketOrder->id, $validatedData['email']),
-                new OrderCompleted($ticketOrder)
-            ])->dispatch();
+            // Wrap the chain dispatch so a job-dispatch failure (e.g.
+            // missing public storage in tests) doesn't roll back an
+            // otherwise-successful order.  The promoter can always
+            // rerun the chain from the order detail page.
+            try {
+                Bus::chain([
+                    new GenerateTicketImagesJob($ticketOrder->id),
+                    new SendCustomerTicketsEmailJob($ticketOrder->id, $validatedData['email']),
+                    new OrderCompleted($ticketOrder)
+                ])->dispatch();
+            } catch (\Throwable $chainErr) {
+                Log::warning('OrderController@store - chain dispatch failed: ' . $chainErr->getMessage(), [
+                    'order_id' => $ticketOrder->id,
+                ]);
+            }
 
             return redirect()->route('promoter.orders.index', ['festival' => $festival]) // Adjust route as necessary
                 ->with('success', __('alert.order_created_success', ['orderId' => $ticketOrder->id]));
         } catch (\Exception $e) {
-            DB::rollBack();
+            try { DB::rollBack(); } catch (\Throwable $_) {}
             Log::error('OrderController@store - Order creation failed: ' . $e->getMessage(), [
                 'request' => $request->except(['password', '_token']),
                 'trace_snippet' => substr($e->getTraceAsString(), 0, 1000)

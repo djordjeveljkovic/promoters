@@ -165,6 +165,17 @@ class Festival extends Model
     }
 
     /**
+     * String representation used when the model is interpolated into
+     * a URL by Laravel's route generator (e.g. `route('admin.foo', $f)`).
+     *
+     * Always return the slug so the URLs are stable across renames.
+     */
+    public function __toString(): string
+    {
+        return (string) ($this->slug ?? '');
+    }
+
+    /**
      * Pick a black-or-white text colour for a given background hex,
      * using the W3C luminance formula.  Useful for buttons / badges
      * that need a legible label on top of the festival's brand colour.

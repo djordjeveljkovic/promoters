@@ -186,7 +186,7 @@ Route::middleware(['auth'])->group(function () {
         // BUG-AUDIT-003: the Livewire component's mount() takes `$order`
         // to match the route parameter name — Livewire doesn't auto-pass
         // route params whose names don't match the mount signature.
-        Route::get('/orders/{order}', OrderDetails::class)->name('orders.show');
+        Route::get('/orders/{order}', OrderDetails::class)->whereNumber('order')->name('orders.show');
         Route::post('/orders/{order}/download-qrcodes', [AdminOrderController::class, 'downloadQRCodes'])->name('orders.downloadQRCodes');
         // BUG-AUDIT-005: admin-side "rerun image generation" endpoint,
         // mirrors the promoter-side route so the admin orders index
@@ -197,6 +197,11 @@ Route::middleware(['auth'])->group(function () {
             ->name('orders.rerun-email-sending');
         Route::put('/orders/{order}/update-payment', [AdminOrderController::class, 'updatePayment'])->name('orders.updatePayment');
         Route::get('/order/create', [AdminOrderController::class, 'create'])->name('orders.create');
+        // B-006: alias the plural /orders/create to the canonical create page.
+        // (Previously the URL was `/order/create` (singular), inconsistent with
+        // `/orders` index. Keep the singular route for back-compat with any
+        // existing bookmark and redirect to it.)
+        Route::get('/orders/create', fn ($festival) => redirect()->route('admin.orders.create', $festival));
         Route::post('/orders', [AdminOrderController::class, 'store'])->name('orders.store');
 
         // Ticket types inside a festival
@@ -231,8 +236,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [PromoterController::class, 'dashboard'])->name('dashboard');
         Route::get('/help', [PromoterController::class, 'help'])->name('help');
         Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-        Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+        Route::get('/orders/{order}', [OrderController::class, 'show'])->whereNumber('order')->name('orders.show');
         Route::get('/order/create', [OrderController::class, 'create'])->name('orders.create');
+        // B-006: pluralised alias for symmetry with the admin route above.
+        Route::get('/orders/create', fn ($festival) => redirect()->route('promoter.orders.create', $festival));
         Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
         // Re-run image generation / re-send email from the promoter order
         // show page (P-019 follow-up so the buttons in the show view
