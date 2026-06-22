@@ -65,6 +65,7 @@ return [
     'sub_commission_cannot_exceed_manager'  => 'Provizija sub-promotera ne može biti veća od vaše provizije (:manager RSD) za ovaj tip karte.',
     'promoter_promoted_to_manager'          => ':name je sada promoter menadžer. Može da kreira svoje sub-promotere.',
     'promoter_demoted'                      => ':name je vraćen na običnog promotera.',
+    'role_changed'                           => ':name je sada :role na ovom festivalu.',
 
     /* ---- Upravljanje korisnicima ---- */
     'user_created'           => 'Korisnik je uspešno kreiran.',
@@ -72,6 +73,7 @@ return [
     'user_deleted'           => 'Korisnik je obrisan.',
     'user_cannot_delete_self'=> 'Ne možete obrisati sopstveni nalog.',
     'user_cannot_delete_admin' => 'Admin i superadmin korisnici ne mogu biti obrisani sa ovog mesta.',
+    'user_cannot_demote_self' => 'Ne možete ukloniti sopstvenu admin ulogu na ovom festivalu.',
 
     /* ---- Promoter CRUD ---- */
     'promoter_created'       => 'Promoter je kreiran i dodeljen festivalu.',

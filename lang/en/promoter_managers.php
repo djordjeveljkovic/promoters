@@ -28,4 +28,15 @@ return [
         'no_ticket_types'    => 'No ticket types yet',
         'no_ticket_types_message' => 'Create a ticket type for this festival before setting commission rates.',
     ],
+
+    // P-025: inline role changer on the promoters index page.
+    'role' => [
+        'admin'            => 'Admin',
+        'promoter'         => 'Promoter',
+        'promoter_manager' => 'Promoter manager',
+        'sub_promoter'     => 'Sub-promoter',
+    ],
+    'change_role_label'   => 'Role on this festival',
+    'change_role_button'  => 'Change role',
+    'change_role_confirm'  => 'Change this user’s role on this festival?',
 ];

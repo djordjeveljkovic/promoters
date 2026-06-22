@@ -38,6 +38,13 @@ return [
         'paid_placeholder'          => 'Unesite plaćeni iznos', // Original was "Platio"
         'cancel_button'             => 'Otkaži',
         'update_button'             => 'Ažuriraj Promotera',
+        // P-070: javni profil
+        'public_profile'        => 'Javni profil',
+        'make_profile_public'   => 'Učini profil ovog promotera javnim',
+        'public_help_text'      => 'Kada je uključeno, svako može videti biografiju i festivale na /p/{id}.',
+        'bio_label'             => 'Kratka biografija',
+        'bio_help_text'         => 'Do 500 karaktera. Čist tekst.',
+        'bio_placeholder'       => 'Kratka prezentacija — za koje vrste događaja prodajete karte?',
     ],
     // Short keys used by the promoter edit page header.
     'edit' => [
@@ -57,4 +64,24 @@ return [
         'cancel_button'             => 'Otkaži',
         'create_button'             => 'Kreiraj Promotera',
     ],
+
+    // P-027: printable commission statement.
+    'statement' => [
+        'page_title'  => 'Izveštaj o proviziji — :name',
+        'stat_orders'    => 'Narudžbine (plaćeno)',
+        'stat_tickets'   => 'Prodatih ulaznica',
+        'stat_gross'     => 'Bruto promet',
+        'stat_commission'=> 'Zarađena provizija',
+        'by_ticket_type' => 'Raspodela po tipu karte',
+        'ledger'         => 'Dnevnik narudžbina',
+        'no_orders'      => 'Nema narudžbina sa provizijom za ovog promotera.',
+        'settlement'     => 'Završni račun',
+        'settlement_total_commission' => 'Ukupna provizija',
+        'settlement_paid'             => 'Već plaćeno organizatorima',
+        'settlement_owed'             => 'Dug organizatorima',
+    ],
+    'statement_button' => 'Izveštaj o proviziji',
+    'print_or_pdf'     => 'Štampaj / Sačuvaj kao PDF',
+    'generated_at'     => 'Generisano',
+    'role_on_this_festival' => 'Uloga na festivalu',
 ];

@@ -18,6 +18,10 @@ return [
         'settingssubmenu' => 'Upravljaj profilom i podesi podešavanja naloga',
     ],
 
+    // P-072: locale switcher
+    'language' => 'Jezik',
+    'switch_language' => 'Promeni jezik',
+
     'theme' => [
         'label' => 'Tema',
         'light' => 'Svetla',

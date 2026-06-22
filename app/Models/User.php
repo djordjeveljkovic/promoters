@@ -29,6 +29,9 @@ class User extends Authenticatable
         'role',
         'paid',
         'parent_id',
+        'bio',
+        'avatar_path',
+        'is_public',
     ];
 
     public function parent(): BelongsTo
@@ -146,6 +149,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_public' => 'boolean',
         ];
     }
 

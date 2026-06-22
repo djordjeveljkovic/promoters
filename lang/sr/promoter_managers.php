@@ -28,4 +28,15 @@ return [
         'no_ticket_types'    => 'Još nema tipova karata',
         'no_ticket_types_message' => 'Kreirajte tip karte za ovaj festival pre podešavanja provizija.',
     ],
+
+    // P-025: inline role changer on the promoters index page.
+    'role' => [
+        'admin'            => 'Admin',
+        'promoter'         => 'Promoter',
+        'promoter_manager' => 'Promoter menadžer',
+        'sub_promoter'     => 'Sub-promoter',
+    ],
+    'change_role_label'   => 'Uloga na festivalu',
+    'change_role_button'  => 'Promeni ulogu',
+    'change_role_confirm'  => 'Promeniti ulogu ovog korisnika na festivalu?',
 ];

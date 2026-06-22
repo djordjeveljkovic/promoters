@@ -147,9 +147,13 @@
         {{-- User menu --}}
         @auth
             <div class="border-t border-[color:var(--ds-divider)] p-3 space-y-2">
-                {{-- Theme toggle (light / system / dark) --}}
+                {{-- Locale + theme toggles (P-072) --}}
+                <div class="flex items-center justify-between gap-2 px-1">
+                    <span class="text-[10px] uppercase tracking-wider text-[color:var(--ds-text-muted)] font-semibold">{{ __('navigation.language') }}</span>
+                    <livewire:locale-switcher :key="'locale-sidebar-'.App::getLocale()" />
+                </div>
                 <div class="flex items-center justify-between px-1">
-                    <span class="text-[10px] uppercase tracking-wider text-[color:var(--ds-text-muted)] font-semibold">{{ __('Theme') }}</span>
+                    <span class="text-[10px] uppercase tracking-wider text-[color:var(--ds-text-muted)] font-semibold">{{ __('navigation.theme.label') }}</span>
                     <x-ds.theme-toggle size="sm" />
                 </div>
 
@@ -191,11 +195,23 @@
                     <div class="text-xs text-[color:var(--ds-text-muted)]">{{ __('Festival') }}</div>
                     <div class="text-sm font-semibold truncate">{{ $currentFestival->displayName() }}</div>
                 </div>
+
+                {{-- P-069: global search --}}
+                <livewire:global-search :key="'global-search-topbar'" />
+
                 <x-ds.button variant="primary" size="sm" :href="route('promoter.orders.create', $festivalParam)" wire:navigate>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                     {{ __('New order') }}
                 </x-ds.button>
             </header>
+        @else
+            {{-- Even when no festival is in scope, superadmins get global search. --}}
+            @if ($u?->isSuperAdmin())
+                <header class="hidden lg:flex h-14 px-6 items-center gap-4 border-b border-[color:var(--ds-divider)] bg-[color:var(--ds-topbar)] sticky top-0 z-10">
+                    <div class="flex-1"></div>
+                    <livewire:global-search :key="'global-search-superadmin'" />
+                </header>
+            @endif
         @endif
 
         {{-- Mobile top bar --}}

@@ -112,6 +112,11 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('superadmin')->name('supe
 Route::get('/f/{slug}', [\App\Http\Controllers\PublicFestivalController::class, 'show'])
     ->name('public.festival');
 
+// P-070: public promoter profile (no login, opt-in per promoter).
+// Only visible when the promoter has flipped `users.is_public = true`.
+Route::get('/p/{id}', [\App\Http\Controllers\PublicPromoterController::class, 'show'])
+    ->name('public.promoter');
+
 /* ============================================================
  *  Authenticated area (any role)
  * ============================================================ */
@@ -167,6 +172,14 @@ Route::middleware(['auth'])->group(function () {
             ->name('promoters.make-manager');
         Route::put('/promoter/{id}/remove-manager', [AdminController::class, 'removeManager'])
             ->name('promoters.remove-manager');
+
+        // P-025: change a user's role_in_festival inline (admin / promoter / sub_promoter).
+        Route::put('/promoter/{id}/role', [AdminController::class, 'changeRole'])
+            ->name('promoters.change-role');
+
+        // P-027: printable commission statement for a single promoter on this festival.
+        Route::get('/promoter/{id}/statement', [AdminController::class, 'promoterStatement'])
+            ->name('promoters.statement');
 
         // Orders inside a festival
         Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');

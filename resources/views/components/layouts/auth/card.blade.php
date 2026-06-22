@@ -37,6 +37,12 @@
                         <div class="px-10 py-8">{{ $slot }}</div>
                     </div>
                 </div>
+
+                {{-- P-072: locale switcher on auth pages so visitors who don't
+                     speak the default locale can flip it without logging in. --}}
+                <div class="flex justify-center">
+                    <livewire:locale-switcher :key="'locale-auth-'.App::getLocale()" />
+                </div>
             </div>
         </div>
         @fluxScripts

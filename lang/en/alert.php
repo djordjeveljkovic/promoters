@@ -64,6 +64,7 @@ return [
     'sub_commission_cannot_exceed_manager'  => 'Sub-promoter commission cannot exceed your own commission of :manager RSD for this ticket type.',
     'promoter_promoted_to_manager'          => ':name is now a promoter manager. They can create their own sub-promoters.',
     'promoter_demoted'                       => ':name was demoted to a regular promoter.',
+    'role_changed'                            => ':name is now a :role on this festival.',
 
     /* ---- User management ---- */
     'user_created'           => 'User created successfully.',
@@ -71,6 +72,7 @@ return [
     'user_deleted'           => 'User deleted.',
     'user_cannot_delete_self'=> 'You cannot delete your own account.',
     'user_cannot_delete_admin' => 'Admin and superadmin users cannot be deleted from here.',
+    'user_cannot_demote_self'  => 'You cannot remove your own admin role on this festival.',
 
     /* ---- Promoter CRUD ---- */
     'promoter_created'       => 'Promoter created and assigned to the festival.',

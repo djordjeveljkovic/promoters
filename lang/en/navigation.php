@@ -19,6 +19,10 @@ return [
         'settingssubmenu' => 'Manage your profile and account settings',
     ],
 
+    // P-072: locale switcher
+    'language' => 'Language',
+    'switch_language' => 'Switch language',
+
     'theme' => [
         'label' => 'Theme',
         'light' => 'Light',
@@ -26,4 +30,6 @@ return [
         'system' => 'System',
         'toggle_aria' => 'Toggle theme',
     ],
+
+
 ];

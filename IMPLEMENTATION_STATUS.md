@@ -36,7 +36,7 @@
 - [ ] P-010/P-011/P-012 Mail template show/version history/preview with real data
 - [ ] P-018 Refund / void flow
 - [ ] P-021 User profile edit verification (existing edit page is comprehensive)
-- [ ] P-025 FestivalUser self-management (admin can change promoter roles)
+- [x] **P-025 FestivalUser self-management (admin can change promoter roles)** ✅ — inline role-changer on promoters index + `PUT /admin/festivals/{festival}/promoter/{id}/role`
 - [ ] P-041 Reassign order to another promoter
 - [ ] P-042 Bulk promoter invite
 - [ ] P-043 Import ticket types from another festival
@@ -46,6 +46,13 @@
 - [ ] P-054 Watch demo / contact form on help
 - [ ] P-060 Notifications center
 - [ ] P-063 Financial reports
+
+## Recently shipped (since last audit)
+
+- [x] **P-072 Language switcher** ✅ — Livewire component in sidebar + auth pages, session-persisted, `SetLocale` middleware honors `?lang=` / `Accept-Language`.
+- [x] **P-069 Global search** ✅ — Livewire component (debounced 250 ms) over festivals/promoters/orders/ticket-types, scoped to accessible festivals, top-bar wired on every page.
+- [x] **P-070 Promoter public profile** ✅ — `/p/{id}` route + view, `is_public` toggle + bio field on `users`, 404 for private profiles and non-promoter users.
+- [x] **P-027 Promoter commission statement** ✅ — `/admin/festivals/{festival}/promoter/{id}/statement` page with summary stats, per-ticket-type breakdown, order-by-order ledger, and print-friendly CSS for Ctrl+P → PDF.
 
 ## Sprint 5 — Polish (P-100+)
 - Deferred.

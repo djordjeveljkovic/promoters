@@ -33,6 +33,13 @@ return [
         'paid_placeholder'          => 'Enter amount paid',
         'cancel_button'             => 'Cancel',
         'update_button'             => 'Update Promoter',
+        // P-070: public profile
+        'public_profile'        => 'Public profile',
+        'make_profile_public'   => 'Make this promoter’s profile public',
+        'public_help_text'      => 'When enabled, anyone can view their bio and festivals at /p/{id}.',
+        'bio_label'             => 'Short bio',
+        'bio_help_text'         => 'Up to 500 characters. Plain text only.',
+        'bio_placeholder'       => 'A short introduction — what kind of events do you sell for?',
     ],
     // Short keys used by the promoter edit page header.
     'edit' => [
@@ -58,4 +65,25 @@ return [
         'cancel_button'             => 'Cancel',    // Common key, can be reused
         'create_button'             => 'Create Promoter',
     ],
+
+    // P-027: printable commission statement.
+    'statement' => [
+        'page_title'  => 'Commission statement — :name',
+        'stat_orders'    => 'Orders (paid)',
+        'stat_tickets'   => 'Tickets sold',
+        'stat_gross'     => 'Gross revenue',
+        'stat_commission'=> 'Commission earned',
+        'by_ticket_type' => 'Breakdown by ticket type',
+        'ledger'         => 'Order-by-order ledger',
+        'no_orders'      => 'No commission-earning orders for this promoter yet.',
+        'settlement'     => 'Settlement',
+        'settlement_total_commission' => 'Total commission',
+        'settlement_paid'             => 'Already paid to organisers',
+        'settlement_owed'             => 'Still owed to organisers',
+    ],
+    // Reusable button labels
+    'statement_button' => 'Commission statement',
+    'print_or_pdf'     => 'Print / Save as PDF',
+    'generated_at'     => 'Generated',
+    'role_on_this_festival' => 'Role on this festival',
 ];

@@ -243,7 +243,7 @@ class AdminController extends Controller
         $festival = $request->attributes->get('festival');
 
         // 1. Fetch promoters assigned to this festival (or all promoters for superadmins)
-        $query = User::where('role', 'promoter');
+        $query = User::whereIn('role', ['promoter', 'sub_promoter']);
         if ($festival) {
             $query->whereHas('festivals', function ($q) use ($festival) {
                 $q->where('festivals.id', $festival->id);
@@ -373,11 +373,16 @@ class AdminController extends Controller
                 Rule::unique('users')->ignore($promoter->id),
             ],
             'password' => 'nullable|string|min:8|confirmed',
+            // P-070: public profile fields.
+            'is_public' => 'nullable|boolean',
+            'bio'       => 'nullable|string|max:500',
         ]);
 
         $promoter->name = $validatedData['name'];
         $promoter->email = $validatedData['email'];
         $promoter->paid = $request->paid;
+        $promoter->is_public = (bool) ($validatedData['is_public'] ?? false);
+        $promoter->bio = $validatedData['bio'] ?? null;
 
         if (!empty($validatedData['password'])) {
             $promoter->password = Hash::make($validatedData['password']);
@@ -490,5 +495,120 @@ class AdminController extends Controller
             return Festival::find((int) $festival);
         }
         return Festival::where('slug', $festival)->first();
+    }
+
+    /**
+     * P-025: change a user's role_in_festival on this festival directly.
+     *
+     * The promoter-managers page already lets the admin promote / demote
+     * `promoter ↔ promoter_manager`. This endpoint covers the rest of the
+     * matrix (`admin` / `promoter` / `sub_promoter`) and is exposed as
+     * an inline dropdown on the promoters index page.
+     */
+    public function changeRole(Request $request, string $festival, string $id)
+    {
+        $festivalModel = $this->resolveFestivalForRoute($request, $festival);
+        $user = $request->user();
+        if (!$user->isFestivalAdmin($festivalModel?->id)) {
+            abort(403, __('alert.role_unauthorized'));
+        }
+
+        $data = $request->validate([
+            'role' => ['required', 'string', 'in:admin,promoter,promoter_manager,sub_promoter'],
+        ]);
+
+        $target = User::findOrFail($id);
+        $newRole = $data['role'];
+
+        // Don't let a festival admin demote themselves out of admin on
+        // their own festival (would lock them out of the scope).
+        if ($target->id === $user->id && $user->isSuperAdmin() === false
+            && $user->roleInFestival($festivalModel->id) === 'admin'
+            && $newRole !== 'admin') {
+            return back()->with('error', __('alert.user_cannot_demote_self'));
+        }
+
+        $existing = $festivalModel->users()
+            ->wherePivot('user_id', $target->id)
+            ->first();
+
+        if ($existing) {
+            $festivalModel->users()->updateExistingPivot($target->id, [
+                'role_in_festival' => $newRole,
+                'assigned_by'      => $user->id,
+                'assigned_at'      => now(),
+            ]);
+        } else {
+            $festivalModel->users()->attach($target->id, [
+                'role_in_festival' => $newRole,
+                'assigned_by'      => $user->id,
+                'assigned_at'      => now(),
+            ]);
+        }
+
+        return back()->with('success', __('alert.role_changed', [
+            'name' => $target->name,
+            'role' => __("promoter_managers.role.{$newRole}"),
+        ]));
+    }
+
+    /**
+     * P-027: printable commission statement for a single promoter on
+     * a single festival.
+     *
+     * Renders an HTML view (which the user can `Ctrl+P` to PDF) that
+     * shows every commission-earning order, the per-ticket-type
+     * breakdown, totals and the running balance owed to / paid by
+     * the promoter.
+     */
+    public function promoterStatement(Request $request, string $festival, string $id)
+    {
+        $festivalModel = $this->resolveFestivalForRoute($request, $festival);
+        $user = $request->user();
+        if (!$user->isFestivalAdmin($festivalModel?->id)) {
+            abort(403, __('alert.role_unauthorized'));
+        }
+
+        $promoter = User::findOrFail($id);
+
+        $orders = \App\Models\TicketOrder::with(['items.ticketType', 'orderedBy'])
+            ->where('requested_by', $promoter->id)
+            ->where('festival_id', $festivalModel->id)
+            ->whereIn('job_status', ['completed', 'sent'])
+            ->orderBy('created_at')
+            ->get();
+
+        $totals = [
+            'orders_count'      => $orders->count(),
+            'tickets_count'     => $orders->sum(fn ($o) => $o->items->sum('quantity')),
+            'gross_revenue'     => (float) $orders->sum('total'),
+            'commission_total'  => (float) $orders->sum('total_commission_earned'),
+            'paid_to_organizer'  => (float) ($promoter->paid ?? 0),
+            'owed_to_organizer'  => 0.0,
+        ];
+        $totals['owed_to_organizer'] = max(0, $totals['gross_revenue'] - $totals['commission_total'] - $totals['paid_to_organizer']);
+
+        // Per-ticket-type breakdown.
+        $byTicketType = $orders->flatMap->items
+            ->groupBy(fn ($i) => $i->ticket_type_id)
+            ->map(function ($items) {
+                $tt = $items->first()->ticketType;
+                return [
+                    'name'        => $tt?->name ?? '—',
+                    'quantity'    => $items->sum('quantity'),
+                    'gross'       => (float) $items->sum(fn ($i) => $i->quantity * ($i->price_at_order ?? $tt?->price ?? 0)),
+                    'commission'  => 0.0,
+                ];
+            })
+            ->values();
+
+        return view('pages.admin.promoters.statement', [
+            'festival'    => $festivalModel,
+            'promoter'    => $promoter,
+            'orders'      => $orders,
+            'totals'      => $totals,
+            'byTicketType'=> $byTicketType,
+            'generatedAt' => now(),
+        ]);
     }
 }
