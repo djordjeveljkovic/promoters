@@ -113,6 +113,7 @@
                             <x-ds.nav-item :href="route('admin.promoters.index', $festivalParam)" :active="request()->routeIs('admin.promoters.*') && !request()->routeIs('admin.promoter-managers.*')" icon="user">{{ __('Promoters') }}</x-ds.nav-item>
                             <x-ds.nav-item :href="route('admin.promoter-managers.index', $festivalParam)" :active="request()->routeIs('admin.promoter-managers.*')" icon="user-cog">{{ __('Manager rates') }}</x-ds.nav-item>
                             <x-ds.nav-item :href="route('admin.orders.index', $festivalParam)" :active="request()->routeIs('admin.orders.*')" icon="shopping-bag">{{ __('Orders') }}</x-ds.nav-item>
+                            <x-ds.nav-item :href="route('admin.scan.index', $festivalParam)" :active="request()->routeIs('admin.scan.*')" icon="qr-code">{{ __('Scan') }}</x-ds.nav-item>
                             <x-ds.nav-item :href="route('admin.mail-templates.index', $festivalParam)" :active="request()->routeIs('admin.mail-templates.*')" icon="envelope">{{ __('Mail templates') }}</x-ds.nav-item>
                         @else
                             <x-ds.nav-item :href="route('admin.festivals.index')" :active="request()->routeIs('admin.festivals.*')" icon="calendar">{{ __('All festivals') }}</x-ds.nav-item>
@@ -182,6 +183,20 @@
 
     {{-- ===================== Main column ===================== --}}
     <div class="flex-1 min-w-0 flex flex-col">
+
+        {{-- P-052: desktop topbar with quick "+ New order" shortcut --}}
+        @if ($currentFestival && ($u?->isPromoter() || $u?->isAdmin() || $u?->isSubPromoter()))
+            <header class="hidden lg:flex h-14 px-6 items-center gap-4 border-b border-[color:var(--ds-divider)] bg-[color:var(--ds-topbar)] sticky top-0 z-10">
+                <div class="flex-1 min-w-0">
+                    <div class="text-xs text-[color:var(--ds-text-muted)]">{{ __('Festival') }}</div>
+                    <div class="text-sm font-semibold truncate">{{ $currentFestival->displayName() }}</div>
+                </div>
+                <x-ds.button variant="primary" size="sm" :href="route('promoter.orders.create', $festivalParam)" wire:navigate>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    {{ __('New order') }}
+                </x-ds.button>
+            </header>
+        @endif
 
         {{-- Mobile top bar --}}
         <header class="lg:hidden h-14 px-4 flex items-center gap-3 border-b border-[color:var(--ds-border)] bg-[color:var(--ds-topbar)] sticky top-0 z-20">

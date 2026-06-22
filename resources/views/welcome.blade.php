@@ -284,7 +284,10 @@
 
     <footer class="landing__footer">
         <span>© {{ date('Y') }} REFEST Festival</span>
-        <span>Built with Laravel &amp; WebGL</span>
+        <span>
+            <a href="{{ route('public.festival', $publicSlug ?? 'refest-2026') }}" class="hover:underline">Public festival page</a>
+            · Built with Laravel &amp; WebGL
+        </span>
     </footer>
 
 </body>

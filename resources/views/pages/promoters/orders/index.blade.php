@@ -5,6 +5,22 @@
         :subtitle="$festival?->location"
     >
         <x-slot:actions>
+            @if ($lastOrder ?? null)
+                {{-- P-046: duplicate the most recent order --}}
+                <x-ds.button variant="secondary" :href="route('promoter.orders.create', $festival) . '?from=' . $lastOrder->id" wire:navigate title="{{ __('Duplicate last order') }}">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    {{ __('Duplicate last') }}
+                </x-ds.button>
+            @endif
+            {{-- P-047: bulk resend --}}
+            <form method="POST" action="{{ route('promoter.orders.resend-last', $festival) }}" class="inline">
+                @csrf
+                <input type="hidden" name="count" value="5">
+                <x-ds.button variant="secondary" type="submit" title="{{ __('Resend the last 5 order emails') }}" onclick="return confirm('{{ __('Re-send the last 5 order emails? This will dispatch new emails to those customers.') }}')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>
+                    {{ __('Resend last 5') }}
+                </x-ds.button>
+            </form>
             <x-ds.button variant="primary" :href="route('promoter.orders.create', $festival)" wire:navigate>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 {{ __('orders.create_new_order_button') }}

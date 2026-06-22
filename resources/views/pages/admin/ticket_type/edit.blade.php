@@ -36,6 +36,11 @@
                 </div>
             </x-ds.field>
 
+            @php
+                $qr = old('qr_coordinates', is_array($ticketType->qr_coordinates) ? $ticketType->qr_coordinates : (is_string($ticketType->qr_coordinates) ? json_decode($ticketType->qr_coordinates, true) : ['x'=>0,'y'=>0,'size'=>100]));
+                if (!is_array($qr)) $qr = ['x'=>0,'y'=>0,'size'=>100];
+            @endphp
+
             <x-ds.field :label="__('ticket_types.edit_form.photo_label')" name="photo" :hint="__('ticket_types.edit_form.photo_help_text')" :error="$errors->first('photo')">
                 @if ($ticketType->photo_path)
                     <div class="mb-2 flex items-center gap-3">
@@ -50,19 +55,47 @@
                 <legend class="px-2 text-sm font-medium text-[color:var(--ds-text)]">
                     {{ __('ticket_types.create_form.qr_fieldset_legend') }} <span class="text-rose-500">*</span>
                 </legend>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    @php $qr = old('qr_coordinates', $ticketType->qr_coordinates ?? ['x'=>0,'y'=>0,'size'=>100]); @endphp
-                    <x-ds.field :label="__('ticket_types.create_form.qr_x_label')" name="qr_coordinate_x" :required="true">
-                        <input type="number" name="qr_coordinate_x" id="qr_coordinate_x" value="{{ $qr['x'] ?? 0 }}" class="ds-input qr-input" min="0" required>
-                    </x-ds.field>
-                    <x-ds.field :label="__('ticket_types.create_form.qr_y_label')" name="qr_coordinate_y" :required="true">
-                        <input type="number" name="qr_coordinate_y" id="qr_coordinate_y" value="{{ $qr['y'] ?? 0 }}" class="ds-input qr-input" min="0" required>
-                    </x-ds.field>
-                    <x-ds.field :label="__('ticket_types.create_form.qr_size_label')" name="qr_coordinate_size" :required="true">
-                        <input type="number" name="qr_coordinate_size" id="qr_coordinate_size" value="{{ $qr['size'] ?? 100 }}" class="ds-input qr-input" min="10" required>
-                    </x-ds.field>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="space-y-3">
+                        <x-ds.field :label="__('ticket_types.create_form.qr_x_label')" name="qr_coordinate_x" :required="true">
+                            <input type="number" name="qr_coordinate_x" id="qr_coordinate_x" value="{{ $qr['x'] ?? 0 }}" class="ds-input qr-input" min="0" required>
+                        </x-ds.field>
+                        <x-ds.field :label="__('ticket_types.create_form.qr_y_label')" name="qr_coordinate_y" :required="true">
+                            <input type="number" name="qr_coordinate_y" id="qr_coordinate_y" value="{{ $qr['y'] ?? 0 }}" class="ds-input qr-input" min="0" required>
+                        </x-ds.field>
+                        <x-ds.field :label="__('ticket_types.create_form.qr_size_label')" name="qr_coordinate_size" :required="true">
+                            <input type="number" name="qr_coordinate_size" id="qr_coordinate_size" value="{{ $qr['size'] ?? 100 }}" class="ds-input qr-input" min="10" required>
+                        </x-ds.field>
+                    </div>
+                    @if ($ticketType->photo_path)
+                        <div class="rounded-md border border-[color:var(--ds-border)] overflow-hidden bg-[color:var(--ds-bg-subtle)]">
+                            <div class="text-[10px] uppercase tracking-wider font-semibold text-[color:var(--ds-text-muted)] px-2 py-1 border-b border-[color:var(--ds-divider)]">{{ __('Preview') }}</div>
+                            <div class="relative" style="aspect-ratio: 1/1;">
+                                <img src="{{ asset($ticketType->photo_path) }}" class="absolute inset-0 w-full h-full object-contain" alt="template">
+                                <div id="qrPreviewBox" class="absolute border-2 border-dashed border-[color:var(--ds-accent)] bg-[color:var(--ds-accent-soft)]" style="left: {{ $qr['x'] }}%; top: {{ $qr['y'] }}%; width: {{ $qr['size'] }}px; height: {{ $qr['size'] }}px;"></div>
+                            </div>
+                        </div>
+                    @endif
                 </div>
                 <input type="hidden" name="qr_coordinates" id="qr_coordinates_json" value='{{ json_encode($qr) }}'>
+                @if ($ticketType->photo_path)
+                    <script>
+                        (function () {
+                            const xIn = document.getElementById('qr_coordinate_x');
+                            const yIn = document.getElementById('qr_coordinate_y');
+                            const sIn = document.getElementById('qr_coordinate_size');
+                            const box = document.getElementById('qrPreviewBox');
+                            if (!xIn || !box) return;
+                            const apply = () => {
+                                box.style.left = xIn.value + '%';
+                                box.style.top = yIn.value + '%';
+                                box.style.width = sIn.value + 'px';
+                                box.style.height = sIn.value + 'px';
+                            };
+                            [xIn, yIn, sIn].forEach(i => i.addEventListener('input', apply));
+                        })();
+                    </script>
+                @endif
             </fieldset>
 
             <fieldset class="rounded-lg border border-[color:var(--ds-border)] p-4 space-y-3">

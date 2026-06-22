@@ -16,6 +16,7 @@
         'shopping-bag'      => 'M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0',
         'plus-circle'       => 'M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20zM12 8v8M8 12h8',
         'question-mark-circle' => 'M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20zM9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01',
+        'qr-code'           => 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h3v3h-3zM18 18h3v3h-3z',
     ];
 @endphp
 

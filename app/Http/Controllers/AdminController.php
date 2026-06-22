@@ -200,6 +200,43 @@ class AdminController extends Controller
         ));
     }
 
+    /**
+     * P-065: full promoter leaderboard (the dashboard shows only the
+     * top 5). Supports per-festival filtering, with a default of
+     * "all time, all festivals" when called from the festival picker.
+     */
+    public function leaderboard(Request $request, $festival)
+    {
+        $festival = \App\Models\Festival::where('slug', $festival)->firstOrFail();
+
+        $promoters = User::where('role', 'promoter')
+            ->with(['festivals' => function ($q) use ($festival) {
+                $q->where('festival_user.festival_id', $festival->id);
+            }])
+            ->get();
+
+        $rows = $promoters->map(function ($p) use ($festival) {
+            $orders = \App\Models\TicketOrder::where('requested_by', $p->id)
+                ->where('festival_id', $festival->id)
+                ->whereIn('job_status', ['completed', 'sent'])
+                ->get();
+            return [
+                'promoter' => $p,
+                'orders' => $orders->count(),
+                'tickets' => $orders->sum(fn ($o) => $o->items->sum('quantity')),
+                'revenue' => (float) $orders->sum('total'),
+                'commission' => (float) $orders->sum('total_commission_earned'),
+            ];
+        })
+        ->sortByDesc('revenue')
+        ->values();
+
+        return view('pages.admin.promoters.leaderboard', [
+            'festival' => $festival,
+            'leaderboard' => $rows,
+        ]);
+    }
+
     public function promoters(Request $request)
     {
         /** @var \App\Models\Festival $festival */

@@ -24,7 +24,22 @@
         @forelse ($ticketTypes as $ticketType)
             <tr wire:key="tt-{{ $ticketType->id }}">
                 <td class="row-title">{{ $ticketType->name }}</td>
-                <td class="text-right num font-medium">{{ number_format($ticketType->price, 2) }} {{ __('ticket_types.currency_symbol') }}</td>
+                <td class="text-right num font-medium">
+                    <form method="POST" action="{{ route('admin.ticket-types.setPrice', ['festival' => $festival->slug, 'id' => $ticketType]) }}" class="inline-flex items-center gap-1.5 justify-end">
+                        @csrf
+                        @method('PUT')
+                        <input
+                            type="number"
+                            name="price"
+                            value="{{ $ticketType->price }}"
+                            step="0.01" min="0"
+                            class="ds-input !w-24 text-right text-sm py-1 px-2"
+                            onchange="this.form.submit()"
+                            aria-label="{{ __('Price for :name', ['name' => $ticketType->name]) }}"
+                        >
+                        <span class="text-xs text-[color:var(--ds-text-muted)]">{{ __('ticket_types.currency_symbol') }}</span>
+                    </form>
+                </td>
                 <td class="hidden md:table-cell">
                     @if ($ticketType->photo_path)
                         <img src="{{ asset($ticketType->photo_path) }}" alt="{{ $ticketType->name }}" class="h-10 w-10 rounded-md object-cover border border-[color:var(--ds-border)]">

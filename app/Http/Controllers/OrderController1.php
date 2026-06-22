@@ -1,6 +1,16 @@
 <?php
 
-namespace App\Http\Controllers;
+/**
+ * DEPRECATED duplicate of OrderController. Pre-dates the multi-festival
+ * refactor. Not referenced by any route — kept only because the sandbox
+ * this project lives in disallows `rm`. Safe to delete.
+ *
+ * If you ever autoload it, note that it declares `class OrderController`
+ * in the `App\Http\Controllers` namespace, which would cause a fatal
+ * "Cannot declare class" error because the real OrderController is in
+ * the same namespace. So don't autoload it.
+ */
+namespace App\Http\Controllers\_deprecated;
 
 use App\Jobs\GenerateTicketImagesJob;
 use App\Jobs\SendCustomerTicketsEmailJob;
@@ -18,7 +28,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class OrderController extends Controller
+class OrderController extends \App\Http\Controllers\Controller
 {
     /**
      * Display a listing of the orders placed by the promoter.

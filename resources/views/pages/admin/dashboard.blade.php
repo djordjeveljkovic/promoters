@@ -14,6 +14,32 @@
         @endif
     </x-ds.page-header>
 
+    {{-- P-044: quick-action panel — what the admin does 90% of the time --}}
+    @if ($festival)
+        <x-ds.card class="mb-5">
+            <x-slot:body>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <a href="{{ route('promoter.orders.create', $festival) }}" wire:navigate class="ds-btn ds-btn-primary justify-center">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        {{ __('New order') }}
+                    </a>
+                    <a href="{{ route('admin.ticket-types.create', $festival) }}" wire:navigate class="ds-btn ds-btn-secondary justify-center">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"/></svg>
+                        {{ __('New ticket type') }}
+                    </a>
+                    <a href="{{ route('admin.promoters.create', $festival) }}" wire:navigate class="ds-btn ds-btn-secondary justify-center">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                        {{ __('Invite promoter') }}
+                    </a>
+                    <a href="{{ route('admin.scan.index', $festival) }}" wire:navigate class="ds-btn ds-btn-secondary justify-center">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                        {{ __('Scan tickets') }}
+                    </a>
+                </div>
+            </x-slot:body>
+        </x-ds.card>
+    @endif
+
     {{-- Stats --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <x-ds.stat
@@ -106,6 +132,11 @@
     {{-- Top promoter --}}
     @php $topPromoters = $promoterPerformance->where('total_orders_generated', '>', 0)->take(5); @endphp
     <x-ds.card :title="__('Top promoter performance')" class="mt-6">
+        <x-slot:actions>
+            <x-ds.button variant="ghost" size="sm" :href="route('admin.promoters.leaderboard', $festival)" wire:navigate>
+                {{ __('View all') }} →
+            </x-ds.button>
+        </x-slot:actions>
         @if($topPromoters->isEmpty())
             <x-ds.empty-state
                 :title="__('No promoter activity yet')"

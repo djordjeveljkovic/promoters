@@ -6,7 +6,16 @@
     />
 
     <x-ds.alert variant="info">
-        {{ __('You operate as a sub-promoter. To place an order, open the promoter dashboard and use the "New order" button.') }}
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+                {{ __('You operate as a sub-promoter. To place an order, open the promoter dashboard and use the "New order" button.') }}
+            </div>
+            @if ($festival)
+                <x-ds.button variant="primary" size="sm" :href="route('promoter.orders.create', ['festival' => $festival->slug])" wire:navigate>
+                    + {{ __('New order') }}
+                </x-ds.button>
+            @endif
+        </div>
     </x-ds.alert>
 
     <x-ds.card :title="__('Recent parent-promoter orders')" class="mt-6">

@@ -4,6 +4,14 @@
         :subtitle="__('Pick a festival to start selling tickets for.')"
     />
 
+    {{-- P-045: prominent banner when the promoter has no festival access --}}
+    @if ($festivals->isEmpty())
+        <x-ds.alert variant="warning" class="mb-4">
+            <div class="font-semibold mb-1">{{ __('You don\'t have access to any festival yet') }}</div>
+            <p class="text-sm">{{ __('Ask a festival admin to add you as a promoter, or reach out to your supervisor.') }}</p>
+        </x-ds.alert>
+    @endif
+
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         @forelse ($festivals as $f)
             <a href="{{ route('promoter.dashboard', ['festival' => $f->slug]) }}" wire:navigate

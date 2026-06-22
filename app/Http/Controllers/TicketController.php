@@ -156,16 +156,20 @@ class TicketController extends Controller // Assuming this is the class name
 
     /**
      * Show the form for editing the specified resource.
-     * We use Route Model Binding here (TicketType $ticketType)
+     *
+     * Signature accepts `$festival` first to match the route's parameter
+     * order; see `OrderController@show` for an explanation of the
+     * Laravel 12 controller-dispatcher parameter-order quirk.
      */
-    public function edit($id) // Assumes Route Model Binding
+    public function edit(string $festival, string $id)
     {
-        $ticketType = TicketType::findOrFail($id);
+        $ticketType = $this->findTicketTypeInFestival($festival, $id);
         // Eager load commissions to avoid N+1 issues in the view
         $ticketType->load('commissions');
 
-        // Pass the ticket type (with its commissions) to the view
-        return view('pages.admin.ticket_type.edit', compact('ticketType'));
+        $festival = \App\Models\Festival::where('slug', $festival)->firstOrFail();
+
+        return view('pages.admin.ticket_type.edit', compact('ticketType', 'festival'));
     }
 
     /**
@@ -284,5 +288,72 @@ class TicketController extends Controller // Assuming this is the class name
             Log::error("Error deleting ticket type ID {$ticketType->id}: " . $e->getMessage());
             return redirect()->back()->with('error', __('alert.ticket_type_delete_failed', ['message' => $e->getMessage()]));
         }
+    }
+
+    /**
+     * Replace the ticket type's photo. Used by the "Change photo" tile on
+     * the edit page (P-013) and as the action target of the inline photo
+     * button on the index (P-015).
+     */
+    public function uploadPhoto(Request $request, string $festival, string $id)
+    {
+        $ticketType = $this->findTicketTypeInFestival($festival, $id);
+        $request->validate(['photo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048']);
+
+        $file = $request->file('photo');
+        $dir = public_path('img/ticket_photos');
+        if (!is_dir($dir)) {
+            mkdir($dir, 0775, true);
+        }
+        $filename = $file->hashName();
+        $file->move($dir, $filename);
+
+        if ($ticketType->photo_path && file_exists(public_path($ticketType->photo_path))) {
+            @unlink(public_path($ticketType->photo_path));
+        }
+
+        $ticketType->update(['photo_path' => 'img/ticket_photos/' . $filename]);
+        return back()->with('success', __('alert.ticket_type_photo_updated'));
+    }
+
+    /**
+     * Update the QR-code placement on the template image (P-014).
+     */
+    public function setQrCoordinates(Request $request, string $festival, string $id)
+    {
+        $ticketType = $this->findTicketTypeInFestival($festival, $id);
+        $data = $request->validate([
+            'qr_coordinates' => 'required|array',
+            'qr_coordinates.x' => 'required|integer|min:0',
+            'qr_coordinates.y' => 'required|integer|min:0',
+            'qr_coordinates.size' => 'required|integer|min:10',
+        ]);
+        $ticketType->update(['qr_coordinates' => $data['qr_coordinates']]);
+        return back()->with('success', __('alert.ticket_type_qr_updated'));
+    }
+
+    /**
+     * Update just the price of a ticket type (P-015).
+     * Lightweight endpoint that the index page can hit from an inline
+     * editor without re-saving the whole form.
+     */
+    public function setPrice(Request $request, string $festival, string $id)
+    {
+        $ticketType = $this->findTicketTypeInFestival($festival, $id);
+        $data = $request->validate(['price' => 'required|numeric|min:0']);
+        $ticketType->update(['price' => $data['price']]);
+        return back()->with('success', __('alert.ticket_type_price_updated'));
+    }
+
+    /**
+     * Helper: look up a ticket type by id, scoped to a festival slug.
+     * Returns 404 if the ticket type doesn't belong to that festival.
+     */
+    private function findTicketTypeInFestival(string $festivalSlug, string $id): TicketType
+    {
+        $festival = \App\Models\Festival::where('slug', $festivalSlug)->firstOrFail();
+        return TicketType::where('festival_id', $festival->id)
+            ->where('id', $id)
+            ->firstOrFail();
     }
 }

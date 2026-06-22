@@ -5,7 +5,14 @@
         <x-slot:body>
             <div class="flex flex-col sm:flex-row justify-between items-start gap-4">
                 <div>
-                    <div class="text-xs uppercase tracking-wider text-[color:var(--ds-text-muted)] font-medium">{{ __('order_details.header.order_prefix') }}</div>
+                    <div class="flex items-center gap-2">
+                        <div class="text-xs uppercase tracking-wider text-[color:var(--ds-text-muted)] font-medium">{{ __('order_details.header.order_prefix') }}</div>
+                        {{-- P-053: print button for the gate staff --}}
+                        <button type="button" onclick="window.print()" class="ds-btn ds-btn-ghost ds-btn-sm" title="{{ __('Print') }}">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                            {{ __('Print') }}
+                        </button>
+                    </div>
                     <div class="text-2xl font-semibold text-[color:var(--ds-text)] mt-1">#{{ $order->order_number ?? $order->id }}</div>
                 </div>
                 <div class="text-left sm:text-right w-full sm:w-auto">

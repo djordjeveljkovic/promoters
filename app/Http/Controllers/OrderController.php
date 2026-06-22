@@ -66,6 +66,10 @@ class OrderController extends Controller
         }
         $orders = $query->latest()->paginate(15);
 
+        // P-046: the promoter's most recent order, so the index can offer
+        // a "Duplicate last" shortcut.
+        $lastOrder = $orders->first();
+
         // Pass status colors for job_status to the view
         $jobStatusColors = [
             'pending'    => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-600 dark:text-yellow-100',
@@ -76,7 +80,7 @@ class OrderController extends Controller
             'sent'       => 'bg-teal-100 text-teal-800 dark:bg-teal-600 dark:text-teal-100',
         ];
 
-        return view('pages.promoters.orders.index', compact('orders', 'jobStatusColors', 'festival'));
+        return view('pages.promoters.orders.index', compact('orders', 'jobStatusColors', 'festival', 'lastOrder'));
     }
 
     /**
@@ -91,7 +95,18 @@ class OrderController extends Controller
             ? $festival->ticketTypes()->orderBy('name')->get()
             : TicketType::orderBy('name')->get();
 
-        return view('pages.promoters.orders.create', compact('ticketTypes', 'festival'));
+        // P-046: when ?from=ID is in the URL, pre-fill the form from that
+        // promoter's most recent order (only the promoter's own orders —
+        // we don't want one promoter to peek at another's customer list).
+        $prefill = null;
+        if ($fromId = $request->query('from')) {
+            $prefill = \App\Models\TicketOrder::where('id', $fromId)
+                ->where('requested_by', Auth::id())
+                ->with('items')
+                ->first();
+        }
+
+        return view('pages.promoters.orders.create', compact('ticketTypes', 'festival', 'prefill'));
     }
 
     /**
@@ -231,15 +246,25 @@ class OrderController extends Controller
 
     /**
      * Display the specified order.
+     *
+     * The signature intentionally has `$festival` first to match the
+     * route's parameter order — the framework passes route parameters
+     * to the controller in the order they appear in the URI, not the
+     * order they're declared in the method signature, and any untyped
+     * values will fail PHP's type check if the method expects a model.
      */
-    public function show(TicketOrder $order) // Route model binding
+    public function show(string $festival, string $order)
     {
+        $order = TicketOrder::where('festival_id',
+            \App\Models\Festival::where('slug', $festival)->value('id') ?? 0
+        )->where('id', $order)->firstOrFail();
+
         // Ensure the authenticated promoter is authorized to view this order
         if ($order->requested_by !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
 
-        $order->load(['items.ticketType', 'tickets.ticketType', 'orderedByUser', 'requestedByUser']);
+        $order->load(['items.ticketType', 'tickets.ticketType', 'orderedBy', 'requestedBy']);
 
         // Calculate total price for display (if not stored directly on order)
         $totalPrice = 0;
@@ -248,6 +273,33 @@ class OrderController extends Controller
         }
 
         return view('pages.promoters.orders.show', compact('order', 'totalPrice'));
+    }
+
+    /**
+     * P-047: re-send the last N order emails for the current promoter.
+     * Useful for promoters whose emails bounced or whose SMTP got stuck.
+     */
+    public function resendLast(Request $request)
+    {
+        $count = (int) $request->input('count', 5);
+        $count = max(1, min($count, 50));
+
+        $festival = $request->attributes->get('festival');
+        $orders = TicketOrder::where('requested_by', Auth::id())
+            ->when($festival, fn ($q) => $q->where('festival_id', $festival->id))
+            ->whereIn('job_status', ['failed', 'completed', 'sent'])
+            ->latest()
+            ->limit($count)
+            ->get();
+
+        $sent = 0;
+        foreach ($orders as $order) {
+            $order->update(['job_status' => 'pending', 'job_failure_reason' => null]);
+            \App\Jobs\SendCustomerTicketsEmailJob::dispatch($order->id);
+            $sent++;
+        }
+
+        return back()->with('success', __('alert.bulk_resend_queued', ['count' => $sent]));
     }
 
     public function rerunImageGeneration(TicketOrder $order)

@@ -2,7 +2,16 @@
     <x-ds.page-header
         :title="__('Pick a festival')"
         :subtitle="__('You have admin access to the festivals below. Click one to manage it.')"
-    />
+    >
+        <x-slot:actions>
+            @if (auth()->user()?->isSuperAdmin())
+                <x-ds.button variant="primary" :href="route('superadmin.festivals.create')" wire:navigate>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    {{ __('New festival') }}
+                </x-ds.button>
+            @endif
+        </x-slot:actions>
+    </x-ds.page-header>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         @forelse ($festivals as $f)
@@ -35,11 +44,17 @@
             <div class="col-span-full">
                 <x-ds.empty-state
                     :title="__('You have no festival assignments yet.')"
-                    :message="__('Ask a superadmin to assign you to a festival.')"
+                    :message="__('Ask a superadmin to assign you to a festival, or browse the public landing pages below.')"
                 >
-                    <x-ds.button variant="primary" :href="route('superadmin.festivals.index')" wire:navigate>
-                        {{ __('Manage festivals') }} →
-                    </x-ds.button>
+                    @if (auth()->user()?->isSuperAdmin())
+                        <x-ds.button variant="primary" :href="route('superadmin.festivals.create')" wire:navigate>
+                            {{ __('Create a festival') }} →
+                        </x-ds.button>
+                    @else
+                        <x-ds.button variant="primary" :href="route('superadmin.festivals.index')" wire:navigate>
+                            {{ __('Manage festivals') }} →
+                        </x-ds.button>
+                    @endif
                 </x-ds.empty-state>
             </div>
         @endforelse

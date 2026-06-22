@@ -48,6 +48,13 @@ return [
     'festival_updated'              => 'Festival je uspešno ažuriran.',
     'festival_deleted'              => 'Festival je obrisan.',
     'festival_cannot_delete_active' => 'Samo festivalsi u statusu "nacrt" mogu biti obrisani. Prvo ga arhivirajte.',
+    'festival_archived'             => 'Festival je arhiviran.',
+    'festival_already_archived'     => 'Festival je već arhiviran.',
+    'festival_restored'             => 'Festival je vraćen.',
+    'festival_not_archived'         => 'Festival nije arhiviran.',
+    'festival_made_public'          => 'Festival je sada vidljiv na javnoj landing strani.',
+    'festival_made_private'         => 'Festival je sada sakriven sa javne landing strane.',
+    'bulk_resend_queued'            => 'Stavljeno :count email(ova) u red za ponovno slanje.',
     'assignment_added'              => 'Korisnik je dodeljen festivalu.',
     'assignment_removed'            => 'Korisnik je uklonjen sa festivala.',
 

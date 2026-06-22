@@ -117,6 +117,44 @@ class FestivalController extends Controller
             ->with('success', __('alert.festival_deleted'));
     }
 
+    /**
+     * P-022: archive an active festival.  Archived festivals stay in
+     * the database (so historical orders and reports keep working) but
+     * are hidden from the active festival picker and from public views.
+     */
+    public function archive(Festival $festival)
+    {
+        if ($festival->status === 'archived') {
+            return back()->with('info', __('alert.festival_already_archived'));
+        }
+        $festival->update(['status' => 'archived']);
+        return back()->with('success', __('alert.festival_archived'));
+    }
+
+    /**
+     * P-022: restore an archived festival back to active.
+     */
+    public function restore(Festival $festival)
+    {
+        if ($festival->status !== 'archived') {
+            return back()->with('info', __('alert.festival_not_archived'));
+        }
+        $festival->update(['status' => 'active']);
+        return back()->with('success', __('alert.festival_restored'));
+    }
+
+    /**
+     * P-024: flip the public-visibility flag (show / hide on the
+     * public landing page).  No re-fetch, just an immediate toggle.
+     */
+    public function togglePublic(Festival $festival)
+    {
+        $festival->update(['is_public' => !$festival->is_public]);
+        return back()->with('success', $festival->is_public
+            ? __('alert.festival_made_public')
+            : __('alert.festival_made_private'));
+    }
+
     /* ---------------------- Helpers ---------------------- */
 
     private function validated(Request $request, ?Festival $festival = null): array

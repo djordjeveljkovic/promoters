@@ -76,6 +76,10 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('superadmin')->name('supe
     Route::get('/festivals/{festival}/edit', [SuperadminFestivalController::class, 'edit'])->name('festivals.edit');
     Route::put('/festivals/{festival}', [SuperadminFestivalController::class, 'update'])->name('festivals.update');
     Route::delete('/festivals/{festival}', [SuperadminFestivalController::class, 'destroy'])->name('festivals.destroy');
+    // P-022 / P-024: lifecycle actions
+    Route::post('/festivals/{festival}/archive', [SuperadminFestivalController::class, 'archive'])->name('festivals.archive');
+    Route::post('/festivals/{festival}/restore', [SuperadminFestivalController::class, 'restore'])->name('festivals.restore');
+    Route::post('/festivals/{festival}/toggle-public', [SuperadminFestivalController::class, 'togglePublic'])->name('festivals.toggle-public');
 
     // Festival assignments (users ↔ festivals)
     Route::get('/festivals/{festival}/assignments', [FestivalAssignmentController::class, 'show'])->name('festivals.assignments');
@@ -94,6 +98,19 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('superadmin')->name('supe
     Route::get('/mail-templates', MailTemplateEditor::class)->name('mail-templates.index');
     Route::get('/mail-templates/preview', MailTemplatePreviewController::class)->name('mail-templates.preview');
 });
+
+/* ============================================================
+ *  Authenticated area (any role)
+ * ============================================================ */
+
+/* ============================================================
+ *  Public, no-auth routes
+ * ============================================================ */
+
+// P-064: public festival landing (no login, no festival scope).
+// Only visible when the festival is `is_public = true` and active.
+Route::get('/f/{slug}', [\App\Http\Controllers\PublicFestivalController::class, 'show'])
+    ->name('public.festival');
 
 /* ============================================================
  *  Authenticated area (any role)
@@ -131,8 +148,14 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:admin|superadmin', 'festival.access:admin'])->prefix('admin/festivals/{festival}')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
+        // P-062: ticket scanner (camera-based QR for the gate)
+        Route::get('/scan', [\App\Http\Controllers\Admin\TicketScanController::class, 'index'])->name('scan.index');
+        Route::post('/scan', [\App\Http\Controllers\Admin\TicketScanController::class, 'scan'])->name('scan.scan');
+        Route::post('/scan/unscan', [\App\Http\Controllers\Admin\TicketScanController::class, 'unscan'])->name('scan.unscan');
+
         // Promoters inside a festival
         Route::get('/promoters', [AdminController::class, 'promoters'])->name('promoters.index');
+        Route::get('/promoter/leaderboard', [AdminController::class, 'leaderboard'])->name('promoters.leaderboard');
         Route::get('/promoter/create', [AdminController::class, 'createPromoter'])->name('promoters.create');
         Route::get('/promoter/edit/{id}', [AdminController::class, 'editPromoter'])->name('promoters.edit');
         Route::post('/promoters', [AdminController::class, 'store'])->name('promoters.store');
@@ -162,7 +185,8 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/ticket-types/{id}', [TicketController::class, 'update'])->name('ticket-types.update');
         Route::put('/ticket-types/{id}/photo', [TicketController::class, 'uploadPhoto']);
         Route::put('/ticket-types/{id}/qr', [TicketController::class, 'setQrCoordinates']);
-        Route::put('/ticket-types/{id}/price', [TicketController::class, 'setPrice']);
+        Route::put('/ticket-types/{id}/price', [TicketController::class, 'setPrice'])
+            ->name('ticket-types.setPrice');
         Route::put('/commissions', [AdminController::class, 'setCommission']);
 
         // Promoter managers + their commission overrides.
@@ -187,6 +211,16 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
         Route::get('/order/create', [OrderController::class, 'create'])->name('orders.create');
         Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+        // Re-run image generation / re-send email from the promoter order
+        // show page (P-019 follow-up so the buttons in the show view
+        // actually do something).
+        Route::post('/orders/{order}/rerun-images', [OrderController::class, 'rerunImageGeneration'])
+            ->name('orders.rerun-image-generation');
+        Route::post('/orders/{order}/rerun-email', [OrderController::class, 'rerunEmailSending'])
+            ->name('orders.rerun-email-sending');
+        // P-047: bulk resend the last N emails (promoter recovery)
+        Route::post('/orders/resend-last', [OrderController::class, 'resendLast'])
+            ->name('orders.resend-last');
 
         // Sub-promoter creation (only promoter managers can do this — the
         // controller enforces the role check).

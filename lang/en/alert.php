@@ -47,6 +47,13 @@ return [
     'festival_updated'              => 'Festival updated successfully.',
     'festival_deleted'              => 'Festival deleted.',
     'festival_cannot_delete_active' => 'Only draft festivals can be deleted. Archive it first.',
+    'festival_archived'             => 'Festival archived.',
+    'festival_already_archived'     => 'Festival is already archived.',
+    'festival_restored'             => 'Festival restored.',
+    'festival_not_archived'         => 'Festival is not archived.',
+    'festival_made_public'          => 'Festival is now visible on the public landing page.',
+    'festival_made_private'         => 'Festival is now hidden from the public landing page.',
+    'bulk_resend_queued'            => 'Queued :count email(s) for re-sending.',
     'assignment_added'              => 'User assigned to the festival.',
     'assignment_removed'            => 'User removed from the festival.',
 

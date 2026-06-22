@@ -74,6 +74,33 @@
                         <x-ds.button variant="ghost" size="sm" :href="route('superadmin.festivals.edit', $f)" wire:navigate>
                             {{ __('Edit') }}
                         </x-ds.button>
+                        {{-- P-024: public visibility toggle --}}
+                        <form action="{{ route('superadmin.festivals.toggle-public', $f) }}" method="POST">
+                            @csrf
+                            <x-ds.button variant="ghost" size="sm" type="submit" title="{{ $f->is_public ? __('Visible on public landing') : __('Hidden from public landing') }}">
+                                @if ($f->is_public)
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                @else
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                                @endif
+                            </x-ds.button>
+                        </form>
+                        {{-- P-022: archive / restore --}}
+                        @if ($f->status === 'archived')
+                            <form action="{{ route('superadmin.festivals.restore', $f) }}" method="POST">
+                                @csrf
+                                <x-ds.button variant="ghost" size="sm" type="submit" title="{{ __('Restore') }}">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                                </x-ds.button>
+                            </form>
+                        @elseif ($f->status === 'active')
+                            <form action="{{ route('superadmin.festivals.archive', $f) }}" method="POST">
+                                @csrf
+                                <x-ds.button variant="ghost" size="sm" type="submit" title="{{ __('Archive') }}" onclick="return confirm('{{ __('Archive this festival? It will be hidden from the active picker but historical data is kept.') }}')">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+                                </x-ds.button>
+                            </form>
+                        @endif
                         @if ($f->status === 'draft')
                             <form action="{{ route('superadmin.festivals.destroy', $f) }}" method="POST" onsubmit="return confirm('{{ __('Delete this draft festival?') }}')">
                                 @csrf @method('DELETE')

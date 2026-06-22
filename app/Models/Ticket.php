@@ -13,6 +13,7 @@ class Ticket extends Model
         'ticket_type_id',
         'ticket_order_id',
         'is_active',
+        'scanned_at',
         'user_id',
         'image_path',
         'qr_code_path',
@@ -20,6 +21,7 @@ class Ticket extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
+        'scanned_at' => 'datetime',
     ];
 
     public function ticketType(): BelongsTo
