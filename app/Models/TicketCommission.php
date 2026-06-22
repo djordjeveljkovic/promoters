@@ -17,6 +17,13 @@ class TicketCommission extends Model
         'min_sold',
         'max_sold',
         'commission_amount',
+        'valid_from',
+        'valid_to',
+    ];
+
+    protected $casts = [
+        'valid_from' => 'datetime',
+        'valid_to'   => 'datetime',
     ];
 
     /**

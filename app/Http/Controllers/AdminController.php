@@ -26,10 +26,66 @@ class AdminController extends Controller
         return view('pages.admin.festivals.index', compact('festivals'));
     }
 
+    /**
+     * M-006: the admin dashboard runs ~15 queries.  Wrap the heavy
+     * computation in a 60-second cache so refreshing the page in
+     * quick succession doesn't hammer MySQL.  Cache key is
+     * per-(user role, festival, user) so an admin in festival A
+     * doesn't see festival B's numbers, and a superadmin (who sees
+     * everything) gets its own bucket.
+     *
+     * The cache is automatically invalidated whenever a TicketOrder
+     * is created/updated/deleted (see {@see \App\Models\TicketOrder::boot()}).
+     */
     public function dashboard(Request $request)
     {
         /** @var \App\Models\Festival $festival */
         $festival = $request->attributes->get('festival');
+        $user = $request->user();
+
+        $cacheKey = sprintf(
+            'admin.dashboard:%s:%s:%s',
+            $user?->id ?? 'guest',
+            $user?->role ?? 'guest',
+            $festival?->id ?? 'all'
+        );
+
+        $stats = \Illuminate\Support\Facades\Cache::remember($cacheKey, 60, function () use ($request, $festival, $user) {
+            return $this->computeDashboardStats($request, $festival, $user);
+        });
+
+        // The view needs the same variable names as before — extract
+        // them back out of the array.
+        extract($stats, EXTR_SKIP);
+
+        return view('pages.admin.dashboard', compact(
+            'festival',
+            'totalRevenueAllTime',
+            'totalPaidAllTime',
+            'totalOrdersAllTime',
+            'totalTicketsEffectivelySoldAllTime',
+            'totalRevenueLast30Days',
+            'totalOrdersLast30Days',
+            'totalTicketsSoldLast30Days',
+            'ticketTypePerformance',
+            'promoterPerformance',
+            'userCountsByRole',
+            'orderStatusCounts',
+            'statusColors',
+            'activeTicketsCount',
+            'inactiveTicketsCount',
+            'recentOrders'
+        ));
+    }
+
+    /**
+     * Pure computation for the dashboard — no caching, no view.  Returns
+     * an associative array of every variable the dashboard view needs.
+     * Extracted from `dashboard()` so the cache wrapper can be a thin
+     * shim and the math itself is unit-testable in isolation.
+     */
+    private function computeDashboardStats(Request $request, ?Festival $festival, ?User $user): array
+    {
 
 	$user = auth()->user();
 	$role = $user->role;
@@ -179,25 +235,24 @@ class AdminController extends Controller
             'pending' => 'bg-yellow-100 text-yellow-800',
         ];
 
-
-        return view('pages.admin.dashboard', compact(
-            'festival',
-            'totalRevenueAllTime',
-            'totalPaidAllTime',
-            'totalOrdersAllTime',
-            'totalTicketsEffectivelySoldAllTime',
-            'totalRevenueLast30Days',
-            'totalOrdersLast30Days',
-            'totalTicketsSoldLast30Days',
-            'ticketTypePerformance',
-            'promoterPerformance',
-            'userCountsByRole',
-            'orderStatusCounts',
-            'statusColors',
-            'activeTicketsCount',
-            'inactiveTicketsCount',
-            'recentOrders'
-        ));
+        return [
+            'festival'                          => $festival,
+            'totalRevenueAllTime'               => $totalRevenueAllTime,
+            'totalPaidAllTime'                  => $totalPaidAllTime,
+            'totalOrdersAllTime'                => $totalOrdersAllTime,
+            'totalTicketsEffectivelySoldAllTime'=> $totalTicketsEffectivelySoldAllTime,
+            'totalRevenueLast30Days'            => $totalRevenueLast30Days,
+            'totalOrdersLast30Days'             => $totalOrdersLast30Days,
+            'totalTicketsSoldLast30Days'        => $totalTicketsSoldLast30Days,
+            'ticketTypePerformance'             => $ticketTypePerformance,
+            'promoterPerformance'               => $promoterPerformance,
+            'userCountsByRole'                  => $userCountsByRole,
+            'orderStatusCounts'                 => $orderStatusCounts,
+            'statusColors'                      => $statusColors,
+            'activeTicketsCount'                => $activeTicketsCount,
+            'inactiveTicketsCount'              => $inactiveTicketsCount,
+            'recentOrders'                      => $recentOrders,
+        ];
     }
 
     /**

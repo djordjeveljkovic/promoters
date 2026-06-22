@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
-        @include('partials.head')
+        @include('partials.head', ['title' => $title ?? null, 'description' => $description ?? null, 'ogImage' => $ogImage ?? null, 'ogType' => $ogType ?? null])
         <script>
             (function () {
                 try {

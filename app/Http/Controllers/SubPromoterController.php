@@ -40,7 +40,11 @@ class SubPromoterController extends Controller
             ->take(10)
             ->get();
 
-        return view('pages.subpromoters.dashboard', compact('festival', 'recentOrders'));
+        // P-001: surface the parent-promoter's identity so the
+        // sub-promoter always knows who they're selling for.
+        $parent = $user->parent_id ? User::find($user->parent_id) : null;
+
+        return view('pages.subpromoters.dashboard', compact('festival', 'recentOrders', 'parent'));
     }
 
     public function placeOrder(Request $request)

@@ -110,25 +110,32 @@ class OrderCompleted implements ShouldQueue
             Log::error("[storeOrderCommission] Promoter not found for Order ID {$order->id}.");
             throw new \RuntimeException("Promoter not found for order {$order->id} during commission calculation.");
         }
-        $promoterModelClass = get_class($promoter);
 
         if ($order->items->isEmpty()) {
             Log::info("[storeOrderCommission] Order ID {$order->id} has no items. Current stored commission: {$originalCommission}. Setting total commission to 0.");
             $totalOrderCommission = 0.00; // Explicitly float
         } else {
+            // M-007: use the CommissionCalculator service instead of
+            // the old static User::calculateCommission().  Catches
+            // NoCommissionTierException so historical orders created
+            // before tiers were defined still get a 0 commission
+            // instead of throwing.
+            $calculator = app(\App\Services\CommissionCalculator::class);
             foreach ($order->items as $item) {
-                $itemCommissionEarned = 0;
-                if (method_exists($promoterModelClass, 'calculateCommission')) {
-                    $itemCommissionEarned = $promoterModelClass::calculateCommission(
-                        $item->ticket_type_id,
-                        $order->id,
-                        $item->quantity,
+                try {
+                    $itemCommissionEarned = $calculator->compute(
                         $promoter,
-                        $order->created_at
+                        (int) $item->ticket_type_id,
+                        (int) $item->quantity,
+                        (int) $order->id,
+                        $order->created_at,
                     );
-                } else {
-                    Log::error("[storeOrderCommission] Static method 'calculateCommission' not found on class {$promoterModelClass} for Order ID {$order->id}, Item ID {$item->id}.");
-                    throw new \BadMethodCallException("Static method calculateCommission not found on {$promoterModelClass}.");
+                } catch (\App\Services\NoCommissionTierException $noTier) {
+                    Log::warning($noTier->getMessage(), [
+                        'order_id'    => $order->id,
+                        'ticket_type' => $item->ticket_type_id,
+                    ]);
+                    $itemCommissionEarned = 0.0;
                 }
 
                 $item->commission_earned = $itemCommissionEarned;

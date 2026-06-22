@@ -1,4 +1,9 @@
-<x-layouts.auth.simple :title="$promoter->name">
+<x-layouts.auth.simple
+    :title="$promoter->name"
+    :description="$promoter->bio ?: __('Discover which festivals :name is selling tickets for on Promoteri.', ['name' => $promoter->name])"
+    :og-image="$promoter->avatar_path ? asset($promoter->avatar_path) : null"
+    :og-type="'profile'"
+>
     <div class="min-h-screen flex flex-col">
         {{-- Hero ----------------------------------------------------------- --}}
         <div class="relative overflow-hidden"

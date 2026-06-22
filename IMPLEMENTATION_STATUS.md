@@ -60,6 +60,22 @@
 - [x] **Dead code moved to `_deprecated/`** ✅ — `OrderController1.php` → `docs/_deprecated/`; `SetLocaleMiddleware.php` → `app/Http/Middleware/_deprecated/`.
 - [x] **Regression tests** ✅ — `tests/Feature/AdminOrderCreateTest.php`, `tests/Feature/FestivalColorFallbackTest.php`.
 
+## Recently shipped (2026-06-22 — third audit)
+- [x] **M-007 `CommissionCalculator` service** ✅ — extracted the tier-overlap math from `User::calculateCommission()` into `App\Services\CommissionCalculator` + `NoCommissionTierException`. The old static method is now a back-compat shim. New edge cases handled (open-ended `max_sold=0`, history-aware counting, no-tier case throws instead of silently returning 0). Covered by 13-case unit test.
+- [x] **T-005 Calculator unit tests** ✅ — `tests/Unit/CommissionCalculatorTest.php`.
+- [x] **M-006 Admin dashboard caching** ✅ — extracted heavy computation to `computeDashboardStats()`, wrapped in `Cache::remember(…, 60, …)` keyed by (user, role, festival). `TicketOrder::booted()` busts the cache on every save/delete. Covered by `AdminDashboardCachingTest`.
+- [x] **T-003 End-to-end order flow test** ✅ — `tests/Feature/EndToEndOrderFlowTest.php` covers the full POST → chain dispatch → commission calculation path with `Bus::fake()`.
+- [x] **M-010 Welcome page hero driven by config + DB** ✅ — the page derives the festival name + year from the active public festival at runtime.
+- [x] **M-012 Open Graph / SEO meta tags** ✅ — `partials.head` now accepts `$description`, `$ogImage`, `$ogType`; the layouts forward them; the public promoter page wires up bio + avatar.
+- [x] **P-001 Sub-promoter dashboard banner** ✅ — explicitly names the parent promoter.
+- [x] **P-006 Two more dashboard quick-action tiles** ✅ — Leaderboard + Mail templates added to the admin dashboard grid.
+- [x] **P-007 Locale-aware date formatting** ✅ — `App\Support\Format` helper with full `FormatTest` coverage; replaced hand-rolled `->format('Y-m-d')` in the order/promoter dashboards.
+- [x] **`TicketCommission` model $fillable fix** ✅ — `valid_from` and `valid_to` are now mass-assignable; without this the tier-overlap math silently used `CURRENT_TIMESTAMP` for every seeded tier. Discovered by `CommissionCalculatorTest`.
+- [x] **`TicketOrder::total_commission_earned` $fillable fix** ✅ — the field was missing from `$fillable`, so any mass-assignment via `update(['total_commission_earned' => …])` was a silent no-op. Discovered by `EndToEndOrderFlowTest`.
+- [x] **Locale-aware money formatter** ✅ — `Format::money(12500)` → `"12,500.00 RSD"`.
+
+Test count after third audit: **160 passed / 383 assertions** (up from 135 / 339).
+
 ## Recently shipped (2026-06-22 — second audit)
 - [x] **U-004 Mail template editor surfaces promoter / admin templates** ✅ — added `promoter.new_order`, `admin.daily_summary`, `admin.image_generation_failed` keys.
 - [x] **U-005 Promoter avatar upload** ✅ — added file upload to the admin promoter-edit form, controller moves the file to `public/img/promoter_avatars/`.

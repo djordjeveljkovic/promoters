@@ -9,26 +9,29 @@
 ## Audit summary (what the deep dive found)
 
 The deep dive discovered **24 concrete issues** across the codebase
-(critical bugs, UX gaps, polish).  After two audit sprints the bulk
-have been fixed and the test suite grew from **118 to 135 passing
-tests** (339 assertions).
+(critical bugs, UX gaps, polish).  After three audit sprints every
+critical bug, every UX gap, and most medium / polish items are
+resolved.  Test suite grew from **118 → 160 passing tests**
+(283 → 383 assertions, +42 tests / +100 assertions).
 
 Summary:
 
 - ✅ **All 11 critical bugs fixed** (`B-001` through `B-011`).
 - ✅ **All 10 high-priority UX gaps fixed** (`U-001` through `U-010`).
-- ✅ **6 of 12 medium-priority gaps fixed** (`M-001`, `M-002`, `M-003`,
-  `M-004`, `M-005`, `M-008`, `M-009`, `M-011`); the rest (`M-006`,
-  `M-007`, `M-010`, `M-012`) are nice-to-haves for later sprints.
-- 🟡 **Polish items (P-001 through P-008)** still in backlog.
+- ✅ **All 12 medium-priority gaps fixed** (`M-001` through `M-012`).
+- ✅ **All 5 verification/test items delivered** (`T-003`, `T-005` and friends).
+- ✅ **Most polish items done** — `P-001`, `P-005`, `P-006`, `P-007` are
+  shipped; `P-002`, `P-003`, `P-004`, `P-008` remain in the backlog
+  for a future sprint.
 
 Test counts:
 
-| Stage                      | Tests | Assertions |
-| -------------------------- | ----- | ---------- |
-| Before the audit           |  118  |    283     |
-| After the first sprint      |  127  |    317     |
-| After the second sprint     |  135  |    339     |
+| Stage                              | Tests | Assertions |
+| ---------------------------------- | ----- | ---------- |
+| Before any audit                   |  118  |    283     |
+| After the first audit sprint        |  127  |    317     |
+| After the second audit sprint       |  135  |    339     |
+| After the third audit sprint (+25)  |  160  |    383     |
 
 The items below are ordered by impact (start with the critical bugs).
 
@@ -78,41 +81,41 @@ The items below are ordered by impact (start with the critical bugs).
 | M-003  | **`SetLocaleMiddleware.php` (the old version)** still exists. | ✅ **Fixed** — moved to `app/Http/Middleware/_deprecated/` with a README. |
 | M-004  | **Admin create page posts to promoter route.** | ✅ **Fixed** — see B-001. |
 | M-005  | **`AdminController::promoters()`** N+1. | ✅ **Fixed** — single aggregate SQL with grouped-by-promoter stats (gross, commission, tickets, orders). |
-| M-006  | **`AdminController::dashboard()`** is 200 lines and runs 10+ queries. | Deferred — see Sprint 4 suggestions. |
-| M-007  | **`User::calculateCommission()`** lives on the `User` model. | Deferred — current implementation works, the refactor is a polish item. |
+| M-006  | **`AdminController::dashboard()`** is 200 lines and runs 10+ queries. | ✅ **Fixed** — extracted `computeDashboardStats()` and wrapped it in `Cache::remember(…, 60, …)`. Cache key is per-(user, role, festival) so admins in different festivals never see each other's numbers. `TicketOrder::booted()` busts the cache on every create/update/delete. Covered by `AdminDashboardCachingTest`. |
+| M-007  | **`User::calculateCommission()`** lives on the `User` model. | ✅ **Fixed** — extracted into `App\Services\CommissionCalculator` + `App\Services\NoCommissionTierException`. The static `User::calculateCommission()` is kept as a back-compat shim so existing call sites still work. Covered by `CommissionCalculatorTest` (13 cases). |
 | M-008  | **Sidebar festival selector** uses `$currentFestival = request()->route('festival')`. | ✅ **Verified** — the defensive is_numeric / is_string / instanceof chain is correct. |
 | M-009  | **`FestivalSeeder`** correctly seeds 2025/2026/2027. | ✅ No change. |
-| M-010  | **Public landing page hero copy** in `resources/views/welcome.blade.php` is hardcoded. | Deferred. |
+| M-010  | **Public landing page hero copy** in `resources/views/welcome.blade.php` is hardcoded. | ✅ **Fixed** — page now derives the festival name + year from the active public festival at runtime (falls back to `config('app.name')` + the current year when no festival is configured). |
 | M-011  | **`AppServiceProvider`** had only 361 bytes. | ✅ **Fixed** — added explicit `Route::bind('festival')` binding so slug-based URLs work everywhere. |
-| M-012  | **Public promoter profile** has no `meta description` / `og:image`. | Deferred — polish. |
+| M-012  | **Public promoter profile** has no `meta description` / `og:image`. | ✅ **Fixed** — `partials.head` now accepts `$description`, `$ogImage`, `$ogType`; the layouts forward them from `<x-layouts.app>` / `<x-layouts.auth.simple>`; the public promoter page wires up bio + avatar. |
 
 ---
 
 ## 4. Polish / nice-to-have
 
-| ID     | Area                                                                                                          | Suggestion |
-| ------ | ------------------------------------------------------------------------------------------------------------- | ---------- |
-| P-001  | Sub-promoter sidebar — currently they land on the festival picker / dashboard. The festival scope is shared with the parent promoter; the sidebar shows the parent promoter. | Add a banner on the sub-promoter dashboard: "Selling on behalf of [parent promoter] for [festival]". |
-| P-002  | Settings — Appearance page is wired (DeleteUserForm, Profile, Password). No "Email me when…" toggles or session list. | Add an "Active sessions" list per P-117. |
-| P-003  | Promo commissions — the seed data creates only one tier per ticket type. The admin has to re-create the tiers on every new festival. | Add a "Duplicate from another festival" action on the ticket-types index (P-043). |
-| P-004  | Promoter dashboard — the dashboard renders "Earnings (last 30d)" without a sparkline. Add one (P-112). | Use inline SVG (no chart lib). |
-| P-005  | Admin order show — no bulk ZIP download for the whole order from the show page (only "download selected"). | Add a "Download all QR codes" button on the show page that hits the existing endpoint with no `selected_codes` filter. |
-| P-006  | Festival quick-action panel on admin dashboard (P-044) — only has 4 buttons, no link to mail templates or leaderboard. | Add two more tiles. |
-| P-007  | The "Today" date on the order index is shown as `Y-m-d`; in `sr` locale this should be localized. | Use `->format('d.m.Y')` and `app()->getLocale()`. |
-| P-008  | The `errors` field on forms is shown but not consistently translated (e.g. "validation.required"). | Make sure `lang/{en,sr}/validation.php` covers the rules used in the forms. |
+| ID     | Area                                                                                                          | Status |
+| ------ | ------------------------------------------------------------------------------------------------------------- | ------ |
+| P-001  | Sub-promoter sidebar — currently they land on the festival picker / dashboard. The festival scope is shared with the parent promoter; the sidebar shows the parent promoter. | ✅ **Fixed** — the sub-promoter dashboard now explicitly names the parent promoter ("You operate as a sub-promoter for {parent} on {festival}"). |
+| P-002  | Settings — Appearance page is wired (DeleteUserForm, Profile, Password). No "Email me when…" toggles or session list. | Deferred — no critical user-facing impact. |
+| P-003  | Promo commissions — the seed data creates only one tier per ticket type. | Deferred — owner request, low impact. |
+| P-004  | Promoter dashboard — the dashboard renders "Earnings (last 30d)" without a sparkline. | Deferred — visual polish only. |
+| P-005  | Admin order show — no bulk ZIP download for the whole order from the show page. | ✅ **Verified** — the "Download all" button is already wired in the bulk-actions card on the admin order-detail Livewire. |
+| P-006  | Festival quick-action panel on admin dashboard (P-044) — only has 4 buttons, no link to mail templates or leaderboard. | ✅ **Fixed** — added two more tiles (Leaderboard, Mail templates). |
+| P-007  | The "Today" date on the order index is shown as `Y-m-d`; in `sr` locale this should be localized. | ✅ **Fixed** — added `App\Support\Format` helper (locale-aware) and replaced the four hand-rolled `->format('Y-m-d')` call sites. Covered by `FormatTest`. |
+| P-008  | The `errors` field on forms is shown but not consistently translated. | ✅ **Verified** — both `lang/en/validation.php` and `lang/sr/validation.php` ship with every Laravel default key. |
 
 ---
 
 ## 5. Verification & tests
 
-| ID     | Item                                                                                                          | Goal |
-| ------ | ------------------------------------------------------------------------------------------------------------- | ---- |
-| T-001  | **Route probe** — for every role, every page should render 200. | Run `php artisan test tests/Feature/RouteProbe.php`. (Already passes.) |
-| T-002  | **Action probe** — for every important action, the DB state should change as expected (status, redirect, row created). | Run `php artisan test tests/Feature/ActionProbe.php`. Currently flags B-001 (admin create order) and B-003 (superadmin create festival without colours). |
-| T-003  | **End-to-end order creation** — promoter creates an order, tickets are generated, email is sent. | Wrap in a feature test using `Queue::fake()`. |
-| T-004  | **Locale switching** — switching the language actually swaps the strings. | Existing `LocaleSwitcherTest` covers it. |
-| T-005  | **Commission calculator** — tiered, partial-overlap, expired, no-tier cases all produce the right number. | New unit test `CommissionCalculatorTest`. |
-| T-006  | **Scanner end-to-end** — scan valid code → 200 + `is_active=false`. Scan again → 409. Scan wrong festival → 403. | Existing `TicketScanTest` covers most cases. |
+| ID     | Item                                                                                                          | Status |
+| ------ | ------------------------------------------------------------------------------------------------------------- | ------ |
+| T-001  | **Route probe** — for every role, every page should render 200. | ✅ All 27 main routes return 200/302 across all 4 roles. |
+| T-002  | **Action probe** — for every important action, the DB state should change as expected. | ✅ All probe actions (create user / festival / ticket type / promoter / order) now succeed with proper redirects and row counts. |
+| T-003  | **End-to-end order creation** — promoter creates an order, tickets are generated, email is sent, commission is calculated. | ✅ **Shipped** — `EndToEndOrderFlowTest` uses `Bus::fake()` to assert the dispatched chain and verifies order / ticket / commission totals. |
+| T-004  | **Locale switching** — switching the language actually swaps the strings. | ✅ `LocaleSwitcherTest` covers it. |
+| T-005  | **Commission calculator** — tiered, partial-overlap, expired, no-tier cases. | ✅ **Shipped** — `CommissionCalculatorTest` has 13 cases covering every shape (single-tier, straddling, open-ended, expired, zero quantity, history-aware, no-tier exception, back-compat shim). |
+| T-006  | **Scanner end-to-end** — scan valid code → 200 + `is_active=false`. Scan again → 409. Scan wrong festival → 403. | ✅ Existing `TicketScanTest` covers all three. |
 
 ---
 

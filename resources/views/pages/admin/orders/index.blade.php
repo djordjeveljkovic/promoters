@@ -81,7 +81,7 @@
                 <td class="hidden md:table-cell text-sm text-[color:var(--ds-text-muted)]">
                     {{ $order->requestedBy->name ?? __('admin_orders.table.promoter_not_available') }}
                 </td>
-                <td class="hidden lg:table-cell text-sm text-[color:var(--ds-text-muted)] num">{{ $order->created_at->format('Y-m-d') }}</td>
+                <td class="hidden lg:table-cell text-sm text-[color:var(--ds-text-muted)] num">{{ \App\Support\Format::date($order->created_at) }}</td>
                 <td class="text-sm">
                     @foreach($order->items as $item)
                         <div class="truncate" style="max-width: 220px;">{{ $item->quantity }}× {{ $item->ticketType->name }}</div>

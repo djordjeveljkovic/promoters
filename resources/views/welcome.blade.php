@@ -232,21 +232,36 @@
     <nav class="landing__nav" aria-label="Primary">
         <div class="landing__brand">
             <span class="landing__brand-mark"></span>
-            <span>REFEST</span>
+            <span>{{ config('app.name', 'Promoteri') }}</span>
         </div>
         <div class="landing__lang">{{ strtoupper(app()->getLocale()) }}</div>
     </nav>
 
     {{-- Main hero --}}
     <main class="landing__overlay">
-        <span class="landing__eyebrow">Sezona 2026 · Ulaznice u prodaji</span>
+        @php
+            // M-010: drive the welcome-page hero from config + a tiny
+            // runtime discovery of the active festival, so the page
+            // reflects whatever the superadmin has configured.
+            $appName      = config('app.name', 'Promoteri');
+            $currentYear  = (int) date('Y');
+            $activeFests  = \App\Models\Festival::query()
+                ->where('status', 'active')
+                ->where('is_public', true)
+                ->orderByDesc('year')
+                ->limit(1)
+                ->get();
+            $heroFestival = $activeFests->first();
+            $heroName     = $heroFestival?->name ?? $appName;
+            $heroYear     = $heroFestival?->year ?? $currentYear;
+        @endphp
+        <span class="landing__eyebrow">{{ $heroYear }} · {{ __('Ulaznice u prodaji') }}</span>
 
-        <h1 class="landing__title">REFEST Festival</h1>
+        <h1 class="landing__title">{{ $heroName }} {{ $heroFestival ? $heroYear : '' }}</h1>
 
         <p class="landing__subtitle">
-            Tvoj sledeći letnji beg počinje ovde.
-            Rezerviši karte, prati program i podeli trenutak sa prijateljima —
-            sve na jednom mestu.
+            {{ __('Tvoj sledeći letnji beg počinje ovde.') }}
+            {{ __('Rezerviši karte, prati program i podeli trenutak sa prijateljima — sve na jednom mestu.') }}
         </p>
 
         <div class="landing__cta-row">

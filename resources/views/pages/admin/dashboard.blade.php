@@ -14,11 +14,11 @@
         @endif
     </x-ds.page-header>
 
-    {{-- P-044: quick-action panel — what the admin does 90% of the time --}}
+    {{-- P-044 / P-006: quick-action panel — what the admin does 90% of the time --}}
     @if ($festival)
         <x-ds.card class="mb-5">
             <x-slot:body>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
                     <a href="{{ route('promoter.orders.create', $festival) }}" wire:navigate class="ds-btn ds-btn-primary justify-center">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                         {{ __('New order') }}
@@ -34,6 +34,14 @@
                     <a href="{{ route('admin.scan.index', $festival) }}" wire:navigate class="ds-btn ds-btn-secondary justify-center">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
                         {{ __('Scan tickets') }}
+                    </a>
+                    <a href="{{ route('admin.promoters.leaderboard', $festival) }}" wire:navigate class="ds-btn ds-btn-secondary justify-center">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+                        {{ __('Leaderboard') }}
+                    </a>
+                    <a href="{{ route('admin.mail-templates.index', $festival) }}" wire:navigate class="ds-btn ds-btn-secondary justify-center">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="18" rx="2"/><polyline points="3 7 12 13 21 7"/></svg>
+                        {{ __('Mail templates') }}
                     </a>
                 </div>
             </x-slot:body>
@@ -191,7 +199,7 @@
                             <div class="text-sm text-[color:var(--ds-text)] truncate" style="max-width: 180px;">{{ $order->email }}</div>
                         </td>
                         <td class="hidden md:table-cell text-sm text-[color:var(--ds-text-muted)]">{{ $order->requestedBy->name ?? '—' }}</td>
-                        <td class="hidden lg:table-cell text-sm text-[color:var(--ds-text-muted)] num">{{ $order->created_at->format('Y-m-d') }}</td>
+                        <td class="hidden lg:table-cell text-sm text-[color:var(--ds-text-muted)] num">{{ \App\Support\Format::date($order->created_at) }}</td>
                         <td class="text-sm">
                             @foreach($order->items as $item)
                                 <div>{{ $item->quantity }}× {{ $item->ticketType->name }}</div>

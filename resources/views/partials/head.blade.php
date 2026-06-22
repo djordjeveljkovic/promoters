@@ -3,6 +3,18 @@
 
 <title>{{ $title ?? config('app.name') }}</title>
 
+@if (!empty($description))
+    <meta name="description" content="{{ $description }}">
+@endif
+
+@if (!empty($ogImage))
+    <meta property="og:image" content="{{ $ogImage }}">
+    <meta name="twitter:image" content="{{ $ogImage }}">
+@endif
+<meta property="og:title" content="{{ $title ?? config('app.name') }}">
+<meta property="og:type" content="{{ $ogType ?? 'website' }}">
+<meta property="og:url" content="{{ url()->current() }}">
+
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">

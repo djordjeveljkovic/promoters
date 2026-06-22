@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    @include('partials.head')
+    @include('partials.head', ['title' => $title ?? null, 'description' => $description ?? null, 'ogImage' => $ogImage ?? null, 'ogType' => $ogType ?? null])
     {{-- Inline, synchronous — runs before <body> so there is no
          flash of unstyled / wrong-theme content. Mirrors what
          @fluxAppearance does but also writes a CSS variable the

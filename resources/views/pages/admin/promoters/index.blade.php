@@ -40,7 +40,7 @@
                         </div>
                     </div>
                 </td>
-                <td class="hidden md:table-cell num text-sm text-[color:var(--ds-text-muted)]">{{ $promoter->created_at->format('Y-m-d') }}</td>
+                <td class="hidden md:table-cell num text-sm text-[color:var(--ds-text-muted)]">{{ \App\Support\Format::date($promoter->created_at) }}</td>
                 <td class="text-right num">{{ number_format($promoter->ticketsSoldCount ?? 0) }}</td>
                 <td class="text-right num">{{ number_format($promoter->madeForOrganizers ?? 0, 2) }}</td>
                 <td class="text-right num">{{ number_format($promoter->totalCommissionEarned ?? 0, 2) }}</td>

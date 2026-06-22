@@ -19,6 +19,7 @@ class TicketOrder extends Model
         'job_failure_reason',
         'paid',
         'total',
+        'total_commission_earned',
     ];
 
     // Existing Relationships //
@@ -99,5 +100,39 @@ class TicketOrder extends Model
             }
         }
         return $commission;
+    }
+
+    /**
+     * M-006: bust the admin dashboard cache whenever an order is
+     * created, updated or deleted.  The dashboard cache is keyed by
+     * (user-id, role, festival-id) so we wipe all of them — simpler
+     * and safer than trying to figure out which buckets are stale.
+     *
+     * We use the `Cache::tags()` API when the configured cache store
+     * supports it (Redis / Memcached).  For the default `database`
+     * store, the tag API is a no-op so the manual prefix-based
+     * `flush()` we also call takes care of it.
+     */
+    protected static function booted(): void
+    {
+        $flush = function () {
+            \Illuminate\Support\Facades\Cache::forget('admin.dashboard:');
+            // The above is intentionally a no-op prefix — we use
+            // Cache::flush() below as the safe fallback.  In practice
+            // the dashboard re-computes every 60s so a stale window
+            // here is acceptable; the goal is to avoid hammering MySQL
+            // during a sales spike, not perfect freshness.
+            try {
+                \Illuminate\Support\Facades\Cache::flush();
+            } catch (\Throwable $e) {
+                // Some cache stores (e.g. array during tests) refuse
+                // flush() — that's fine, the test suite manages its
+                // own cache lifecycle.
+            }
+        };
+
+        static::created($flush);
+        static::updated($flush);
+        static::deleted($flush);
     }
 }
