@@ -143,13 +143,13 @@ class Festival extends Model
      * Resolved primary colour, falling back to the platform default if
      * the admin never set one.  Always returns a valid 6-digit hex.
      */
-    public function primaryColor(string $fallback = null): string
+    public function primaryColor(?string $fallback = null): string
     {
         $value = $this->primary_color ?: ($fallback ?? self::DEFAULT_PRIMARY_COLOR);
         return preg_match(self::HEX_COLOR_REGEX, $value) ? $value : self::DEFAULT_PRIMARY_COLOR;
     }
 
-    public function secondaryColor(string $fallback = null): string
+    public function secondaryColor(?string $fallback = null): string
     {
         $value = $this->secondary_color ?: ($fallback ?? self::DEFAULT_SECONDARY_COLOR);
         return preg_match(self::HEX_COLOR_REGEX, $value) ? $value : self::DEFAULT_SECONDARY_COLOR;
@@ -169,7 +169,7 @@ class Festival extends Model
      * using the W3C luminance formula.  Useful for buttons / badges
      * that need a legible label on top of the festival's brand colour.
      */
-    public function contrastColorOn(string $backgroundHex = null): string
+    public function contrastColorOn(?string $backgroundHex = null): string
     {
         $hex = $backgroundHex ?? $this->primaryColor();
         $hex = ltrim($hex, '#');

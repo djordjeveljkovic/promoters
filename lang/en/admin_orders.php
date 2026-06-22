@@ -29,6 +29,7 @@ return [
         'status_tooltip_failure_prefix' => 'Click to view failure:',
         'action_view' => 'View',
         'action_generate_images' => 'Generate Images',
+        'action_resend_email' => 'Resend email',
         'action_generate_images_tooltip_failure_prefix' => 'Retry Image Generation. Failure:',
         'action_send_mail' => 'Send Mail',
         'action_send_mail_tooltip_base' => 'Resend/Retry Email.',

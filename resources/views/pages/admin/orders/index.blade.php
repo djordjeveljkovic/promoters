@@ -111,11 +111,19 @@
                         <x-ds.button variant="ghost" size="sm" :href="route('admin.orders.show', ['festival' => $festival->slug, 'order' => $order->id])" wire:navigate>
                             {{ __('admin_orders.table.action_view') }}
                         </x-ds.button>
-                        @if ($order->job_status === 'failed')
-                            <form action="{{ route('orders.rerunImageJob', $order->id) }}" method="POST">
+                        @if (in_array($order->job_status, ['failed', 'pending', 'processing', 'blocked']))
+                            <form action="{{ route('admin.orders.rerun-image-generation', ['festival' => $festival->slug, 'order' => $order->id]) }}" method="POST">
                                 @csrf
-                                <x-ds.button variant="ghost" size="sm" type="submit">
+                                <x-ds.button variant="ghost" size="sm" type="submit" title="{{ __('admin_orders.table.action_generate_images') }}">
                                     {{ __('admin_orders.table.action_generate_images') }}
+                                </x-ds.button>
+                            </form>
+                        @endif
+                        @if (in_array($order->job_status, ['completed', 'sent', 'failed']))
+                            <form action="{{ route('admin.orders.rerun-email-sending', ['festival' => $festival->slug, 'order' => $order->id]) }}" method="POST">
+                                @csrf
+                                <x-ds.button variant="ghost" size="sm" type="submit" title="{{ __('admin_orders.table.action_resend_email') }}">
+                                    {{ __('admin_orders.table.action_resend_email') }}
                                 </x-ds.button>
                             </form>
                         @endif

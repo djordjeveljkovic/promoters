@@ -170,8 +170,18 @@ Route::middleware(['auth'])->group(function () {
 
         // Orders inside a festival
         Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
+        // BUG-AUDIT-003: the Livewire component's mount() takes `$order`
+        // to match the route parameter name — Livewire doesn't auto-pass
+        // route params whose names don't match the mount signature.
         Route::get('/orders/{order}', OrderDetails::class)->name('orders.show');
         Route::post('/orders/{order}/download-qrcodes', [AdminOrderController::class, 'downloadQRCodes'])->name('orders.downloadQRCodes');
+        // BUG-AUDIT-005: admin-side "rerun image generation" endpoint,
+        // mirrors the promoter-side route so the admin orders index
+        // "Generate images" button has a real target.
+        Route::post('/orders/{order}/rerun-image-generation', [AdminOrderController::class, 'rerunImageGeneration'])
+            ->name('orders.rerun-image-generation');
+        Route::post('/orders/{order}/rerun-email-sending', [AdminOrderController::class, 'rerunEmailSending'])
+            ->name('orders.rerun-email-sending');
         Route::put('/orders/{order}/update-payment', [AdminOrderController::class, 'updatePayment'])->name('orders.updatePayment');
         Route::get('/order/create', [AdminOrderController::class, 'create'])->name('orders.create');
         Route::post('/orders', [AdminOrderController::class, 'store'])->name('orders.store');

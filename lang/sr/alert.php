@@ -71,6 +71,11 @@ return [
     'user_updated'           => 'Korisnik je uspešno ažuriran.',
     'user_deleted'           => 'Korisnik je obrisan.',
     'user_cannot_delete_self'=> 'Ne možete obrisati sopstveni nalog.',
+    'user_cannot_delete_admin' => 'Admin i superadmin korisnici ne mogu biti obrisani sa ovog mesta.',
+
+    /* ---- Promoter CRUD ---- */
+    'promoter_created'       => 'Promoter je kreiran i dodeljen festivalu.',
+    'promoter_deleted'       => 'Promoter je uklonjen sa festivala.',
 
     /* ---- Autorizacija ---- */
     'no_festival_access'     => 'Nemate pristup ovom festivalu.',

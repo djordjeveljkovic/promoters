@@ -72,18 +72,18 @@
                 </td>
                 <td>
                     <div class="row-actions">
-                        @if ($order->job_status === 'failed')
-                            <form action="{{ route('orders.rerunImageJob', $order->id) }}" method="POST">
+                        @if (in_array($order->job_status, ['failed', 'pending', 'processing', 'blocked']))
+                            <form action="{{ route('promoter.orders.rerun-image-generation', ['festival' => $festival, 'order' => $order->id]) }}" method="POST">
                                 @csrf
-                                <x-ds.button variant="ghost" size="sm" type="submit">
+                                <x-ds.button variant="ghost" size="sm" type="submit" title="{{ __('orders.table.actions_retry_images_button') }}">
                                     {{ __('orders.table.actions_retry_images_button') }}
                                 </x-ds.button>
                             </form>
                         @endif
                         @if (in_array($order->job_status, ['completed', 'sent', 'failed']))
-                            <form action="{{ route('orders.rerunEmailJob', $order->id) }}" method="POST">
+                            <form action="{{ route('promoter.orders.rerun-email-sending', ['festival' => $festival, 'order' => $order->id]) }}" method="POST">
                                 @csrf
-                                <x-ds.button variant="ghost" size="sm" type="submit">
+                                <x-ds.button variant="ghost" size="sm" type="submit" title="{{ __('orders.table.actions_resend_email_button') }}">
                                     {{ __('orders.table.actions_resend_email_button') }}
                                 </x-ds.button>
                             </form>

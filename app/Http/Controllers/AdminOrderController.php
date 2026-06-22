@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\GenerateTicketImagesJob;
+use App\Jobs\SendCustomerTicketsEmailJob;
 use App\Models\TicketOrder;
 use App\Models\Festival;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use ZipArchive;
 use Illuminate\Support\Facades\Storage;
 
@@ -175,25 +178,89 @@ class AdminOrderController extends Controller
     }
     /**
      * Show the form for editing the specified resource.
+     * (Reserved — order editing is not exposed in the UI today.)
      */
     public function edit(string $id)
     {
-        //
+        abort(404);
     }
 
     /**
      * Update the specified resource in storage.
+     * (Reserved — order editing is not exposed in the UI today.)
      */
     public function update(Request $request, string $id)
     {
-        //
+        abort(404);
     }
 
     /**
      * Remove the specified resource from storage.
+     * (Reserved — order deletion is intentionally not exposed in the UI;
+     * historical orders should be preserved for accounting.)
      */
     public function destroy(string $id)
     {
-        //
+        abort(404);
+    }
+
+    /**
+     * BUG-AUDIT-005: admin-side mirror of OrderController@rerunImageGeneration.
+     * Re-queues the GenerateTicketImagesJob for the order so the
+     * admin orders index "Generate images" button has a working endpoint.
+     */
+    public function rerunImageGeneration(Request $request, string $festival, string $order)
+    {
+        // Authorize: the order must belong to the festival in scope.
+        $festivalModel = $request->attributes->get('festival');
+        $ticketOrder = TicketOrder::find($order);
+        if (!$ticketOrder) {
+            abort(404);
+        }
+        if ($festivalModel instanceof Festival && $ticketOrder->festival_id !== $festivalModel->id) {
+            abort(403, __('alert.role_unauthorized'));
+        }
+
+        if (in_array($ticketOrder->job_status, ['failed', 'pending', 'processing', 'blocked'], true)) {
+            $ticketOrder->job_status = 'pending';
+            $ticketOrder->job_failure_reason = null;
+            $ticketOrder->save();
+            GenerateTicketImagesJob::dispatch($ticketOrder->id);
+            return back()->with('success', __('alert.image_generation_requeued', ['orderId' => $ticketOrder->id]));
+        }
+        return back()->with('info', __('alert.image_generation_cannot_rerun', [
+            'orderId' => $ticketOrder->id,
+            'status' => $ticketOrder->job_status,
+        ]));
+    }
+
+    /**
+     * BUG-AUDIT-005: admin-side mirror of OrderController@rerunEmailSending.
+     */
+    public function rerunEmailSending(Request $request, string $festival, string $order)
+    {
+        $festivalModel = $request->attributes->get('festival');
+        $ticketOrder = TicketOrder::find($order);
+        if (!$ticketOrder) {
+            abort(404);
+        }
+        if ($festivalModel instanceof Festival && $ticketOrder->festival_id !== $festivalModel->id) {
+            abort(403, __('alert.role_unauthorized'));
+        }
+
+        if (in_array($ticketOrder->job_status, ['failed', 'completed', 'sent', 'processing'], true)) {
+            $wasFailed = $ticketOrder->job_status === 'failed';
+            $ticketOrder->job_status = 'pending';
+            if ($wasFailed) {
+                $ticketOrder->job_failure_reason = null;
+            }
+            $ticketOrder->save();
+            SendCustomerTicketsEmailJob::dispatch($ticketOrder->id, $ticketOrder->email);
+            return back()->with('success', __('alert.email_requeued_success', ['orderId' => $ticketOrder->id]));
+        }
+        return back()->with('info', __('alert.email_cannot_resent', [
+            'orderId' => $ticketOrder->id,
+            'status' => $ticketOrder->job_status,
+        ]));
     }
 }

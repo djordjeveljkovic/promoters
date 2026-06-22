@@ -33,11 +33,16 @@ return [
         'email_label'               => 'Email',
         'password_label'            => 'Lozinka',
         'password_placeholder_edit' => 'Ostavite prazno da zadržite trenutnu lozinku',
-        'password_help_text'        => 'Ostavite prazno ako ne želite da promenite lozinku.',
+        'password_help_text'        => "Ostavite prazno ako ne želite da promenite lozinku.",
         'paid_label'                => 'Plaćeni iznos:', // Original was "Platio:"
         'paid_placeholder'          => 'Unesite plaćeni iznos', // Original was "Platio"
         'cancel_button'             => 'Otkaži',
         'update_button'             => 'Ažuriraj Promotera',
+    ],
+    // Short keys used by the promoter edit page header.
+    'edit' => [
+        'page_title' => 'Izmeni promotera',
+        'main_heading' => 'Izmeni promotera',
     ],
 
     'create_form' => [

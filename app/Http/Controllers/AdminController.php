@@ -288,19 +288,35 @@ class AdminController extends Controller
         return view('pages.admin.promoters.index', compact('promoters', 'festival'));
     }
 
-    public function createPromoter()
+    /**
+     * Note on parameter ordering:
+     *   The route signature for every action below is
+     *       /admin/festivals/{festival}/promoter/.../{id}
+     *   Laravel 12 dispatches route parameters to controller methods in
+     *   the order they appear in the URL — NOT in the order declared in
+     *   the method signature.  Every method therefore takes
+     *   `string $festival` as the first parameter, followed by the
+     *   resource id.  The festival id/slug is resolved from the request
+     *   attributes that `EnsureFestivalAccess` already set, so we don't
+     *   re-query when the URL gives us a slug.
+     */
+    public function createPromoter(Request $request, string $festival)
     {
-        return view('pages.admin.promoters.create');
+        $festivalModel = $this->resolveFestivalForRoute($request, $festival);
+        return view('pages.admin.promoters.create', ['festival' => $festivalModel]);
     }
 
-    public function editPromoter($id)
+    public function editPromoter(Request $request, string $festival, string $id)
     {
+        $festivalModel = $this->resolveFestivalForRoute($request, $festival);
         $promoter = User::findOrFail($id);
-        return view('pages.admin.promoters.edit', compact('promoter'));
+        return view('pages.admin.promoters.edit', ['festival' => $festivalModel, 'promoter' => $promoter]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, string $festival)
     {
+        $festivalModel = $this->resolveFestivalForRoute($request, $festival);
+
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'email' => [
@@ -324,11 +340,28 @@ class AdminController extends Controller
 
         $promoter->save();
 
-        return redirect()->route('admin.promoters.index')->with('success', __('alert.promoter_updated_success'));
+        // Auto-assign the new promoter to the current festival so they
+        // can immediately sell tickets (without this the promoter would
+        // need a superadmin to manually attach them).
+        if ($festivalModel) {
+            $festivalModel->users()->syncWithoutDetaching([
+                $promoter->id => [
+                    'role_in_festival' => 'promoter',
+                    'assigned_by'      => $request->user()?->id,
+                    'assigned_at'      => now(),
+                ],
+            ]);
+        }
+
+        return redirect()
+            ->route('admin.promoters.index', ['festival' => $festival])
+            ->with('success', __('alert.promoter_created'));
     }
 
-    public function updatePromoter(Request $request, $id)
+    public function updatePromoter(Request $request, string $festival, string $id)
     {
+        $this->resolveFestivalForRoute($request, $festival);
+
         $promoter = User::findOrFail($id);
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
@@ -352,7 +385,33 @@ class AdminController extends Controller
 
         $promoter->save();
 
-        return redirect()->route('admin.promoters.edit', $id)->with('success', __('alert.promoter_updated_success'));
+        return redirect()
+            ->route('admin.promoters.edit', ['festival' => $festival, 'id' => $promoter->id])
+            ->with('success', __('alert.promoter_updated_success'));
+    }
+
+    public function deletePromoter(Request $request, string $festival, string $id)
+    {
+        $festivalModel = $this->resolveFestivalForRoute($request, $festival);
+
+        $promoter = User::findOrFail($id);
+
+        // Only allow deletion of users that aren't the last admin/superadmin.
+        if (in_array($promoter->role, ['admin', 'superadmin'], true)) {
+            return back()->with('error', __('alert.user_cannot_delete_admin'));
+        }
+
+        // Detach from the festival first so the pivot is cleaned up
+        // explicitly, then delete the user.
+        if ($festivalModel) {
+            $festivalModel->users()->detach($promoter->id);
+        }
+
+        $promoter->delete();
+
+        return redirect()
+            ->route('admin.promoters.index', ['festival' => $festival])
+            ->with('success', __('alert.promoter_deleted'));
     }
 
     /**
@@ -361,28 +420,29 @@ class AdminController extends Controller
      * with them.  Idempotent: if the user already has a manager pivot
      * row, we re-activate it.
      */
-    public function makeManager(Request $request, Festival $festival, $id)
+    public function makeManager(Request $request, string $festival, string $id)
     {
+        $festivalModel = $this->resolveFestivalForRoute($request, $festival);
         $user = $request->user();
-        if (!$user->isFestivalAdmin($festival->id)) {
+        if (!$user->isFestivalAdmin($festivalModel?->id)) {
             abort(403, __('alert.role_unauthorized'));
         }
 
         $promoter = User::findOrFail($id);
 
         // Re-attach (or update) the pivot with role_in_festival = promoter_manager.
-        $existing = $festival->users()
+        $existing = $festivalModel->users()
             ->wherePivot('user_id', $promoter->id)
             ->first();
 
         if ($existing) {
-            $festival->users()->updateExistingPivot($promoter->id, [
+            $festivalModel->users()->updateExistingPivot($promoter->id, [
                 'role_in_festival' => 'promoter_manager',
                 'assigned_by'      => $user->id,
                 'assigned_at'      => now(),
             ]);
         } else {
-            $festival->users()->attach($promoter->id, [
+            $festivalModel->users()->attach($promoter->id, [
                 'role_in_festival' => 'promoter_manager',
                 'assigned_by'      => $user->id,
                 'assigned_at'      => now(),
@@ -397,20 +457,38 @@ class AdminController extends Controller
      * festival.  We close the manager pivot (set valid_to) so historical
      * commission overrides are preserved.
      */
-    public function removeManager(Request $request, Festival $festival, $id)
+    public function removeManager(Request $request, string $festival, string $id)
     {
+        $festivalModel = $this->resolveFestivalForRoute($request, $festival);
         $user = $request->user();
-        if (!$user->isFestivalAdmin($festival->id)) {
+        if (!$user->isFestivalAdmin($festivalModel?->id)) {
             abort(403, __('alert.role_unauthorized'));
         }
 
         $promoter = User::findOrFail($id);
 
         // Just downgrade the role_in_festival on the existing pivot row.
-        $festival->users()->updateExistingPivot($promoter->id, [
+        $festivalModel->users()->updateExistingPivot($promoter->id, [
             'role_in_festival' => 'promoter',
         ]);
 
         return back()->with('success', __('alert.promoter_demoted', ['name' => $promoter->name]));
+    }
+
+    /**
+     * Resolve the festival model from either:
+     *  - the request attributes set by EnsureFestivalAccess middleware, or
+     *  - a slug / id string passed via the URL.
+     */
+    private function resolveFestivalForRoute(Request $request, string $festival): ?Festival
+    {
+        $attr = $request->attributes->get('festival');
+        if ($attr instanceof Festival) {
+            return $attr;
+        }
+        if (is_numeric($festival)) {
+            return Festival::find((int) $festival);
+        }
+        return Festival::where('slug', $festival)->first();
     }
 }

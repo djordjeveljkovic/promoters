@@ -70,6 +70,11 @@ return [
     'user_updated'           => 'User updated successfully.',
     'user_deleted'           => 'User deleted.',
     'user_cannot_delete_self'=> 'You cannot delete your own account.',
+    'user_cannot_delete_admin' => 'Admin and superadmin users cannot be deleted from here.',
+
+    /* ---- Promoter CRUD ---- */
+    'promoter_created'       => 'Promoter created and assigned to the festival.',
+    'promoter_deleted'       => 'Promoter removed from the festival.',
 
     /* ---- Authorization ---- */
     'no_festival_access'     => 'You do not have access to this festival.',

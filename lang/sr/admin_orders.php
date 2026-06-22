@@ -29,6 +29,7 @@ return [
         'status_tooltip_failure_prefix' => 'Kliknite da vidite grešku:',
         'action_view' => 'Pregledaj',
         'action_generate_images' => 'Generiši Slike',
+        'action_resend_email' => 'Pošalji email ponovo',
         'action_generate_images_tooltip_failure_prefix' => 'Ponovno generisanje slika. Greška:',
         'action_send_mail' => 'Pošalji Email',
         'action_send_mail_tooltip_base' => 'Ponovo pošalji/Pokušaj email.',

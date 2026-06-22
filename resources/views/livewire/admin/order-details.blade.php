@@ -131,7 +131,7 @@
         <x-ds.card :title="__('order_details.actions.group_title')">
             <x-slot:body>
                 <div class="flex flex-wrap items-center gap-2">
-                    <form method="POST" action="{{ route('admin.orders.downloadQRCodes', ['order' => $order->id]) }}">
+                    <form method="POST" action="{{ route('admin.orders.downloadQRCodes', ['festival' => $order->festival_id, 'order' => $order->id]) }}">
                         @csrf
                         @foreach($selectedCodes as $code)
                             <input type="hidden" name="selected_codes[]" value="{{ $code }}">
@@ -141,7 +141,7 @@
                         </x-ds.button>
                     </form>
 
-                    <form method="POST" action="{{ route('admin.orders.downloadQRCodes', ['order' => $order->id]) }}">
+                    <form method="POST" action="{{ route('admin.orders.downloadQRCodes', ['festival' => $order->festival_id, 'order' => $order->id]) }}">
                         @csrf
                         <x-ds.button variant="secondary" size="sm" type="submit">
                             {{ __('order_details.actions.download_all_button') }}

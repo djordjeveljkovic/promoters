@@ -1,10 +1,12 @@
-<x-layouts.app :title="__('promoters.create_form.page_title')">
+<x-layouts.app :title="__('promoters.edit.page_title')">
     <x-ds.page-header
-        :title="__('Edit promoter')"
+        :title="__('promoters.edit.main_heading')"
         :subtitle="$promoter->name . ' · ' . ($festival?->displayName() ?? '')"
     >
         <x-slot:actions>
-            <x-ds.button variant="ghost" :href="route('admin.promoters.index', $festival)" wire:navigate>← {{ __('Back to list') }}</x-ds.button>
+            <x-ds.button variant="ghost" :href="route('admin.promoters.index', $festival)" wire:navigate>
+                ← {{ __('Back to list') }}
+            </x-ds.button>
         </x-slot:actions>
     </x-ds.page-header>
 
@@ -21,13 +23,17 @@
                 <input type="email" name="email" value="{{ old('email', $promoter->email) }}" class="ds-input" required>
             </x-ds.field>
 
-            <x-ds.field :label="__('promoters.create_form.password_label')" name="password" :hint="__('Leave blank to keep current password.')" :error="$errors->first('password')">
+            <x-ds.field :label="__('promoters.edit_form.password_label')" name="password" :hint="__('promoters.edit_form.password_help_text')" :error="$errors->first('password')">
                 <input type="password" name="password" class="ds-input" minlength="8">
             </x-ds.field>
 
             <div class="flex items-center justify-end gap-2 pt-3 border-t border-[color:var(--ds-divider)]">
-                <x-ds.button variant="secondary" :href="route('admin.promoters.index', $festival)" wire:navigate">{{ __('promoters.create_form.cancel_button') }}</x-ds.button>
-                <x-ds.button variant="primary" type="submit">{{ __('Save changes') }}</x-ds.button>
+                <x-ds.button variant="secondary" :href="route('admin.promoters.index', $festival)" wire:navigate>
+                    {{ __('promoters.edit_form.cancel_button') }}
+                </x-ds.button>
+                <x-ds.button variant="primary" type="submit">
+                    {{ __('promoters.edit_form.update_button') }}
+                </x-ds.button>
             </div>
         </form>
     </x-ds.card>

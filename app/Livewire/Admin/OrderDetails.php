@@ -27,15 +27,35 @@ class OrderDetails extends Component
         'paid.min' => 'The paid amount cannot be negative.',
     ];
 
-    public function mount($id)
+    /**
+     * BUG-AUDIT-003 fix: Livewire passes route parameters to mount()
+     * by NAME match. The route is `/orders/{order}` so we accept
+     * `$order` (not `$id`). Accepting either keeps backwards
+     * compatibility with the previous signature for any inline
+     * usage from other Livewire components.
+     *
+     * Livewire 3 also auto-resolves route-model-binding for typed
+     * parameters, so when the route uses `{order}` the framework
+     * may inject an actual `TicketOrder` model rather than the raw
+     * id.  We accept either form.
+     */
+    public function mount($order = null, $id = null)
     {
-        // Load order with tickets and their types. Ensure 'is_active' is loaded for tickets.
-        $order = TicketOrder::with('tickets.ticketType')->findOrFail($id);
+        $key = $order ?? $id;
+        abort_if($key === null, 404);
 
-        $this->order = $order;
-        $this->paid = $order->paid;
-        $this->totalPrice = $order->total;
-        $this->groupedTickets = $order->tickets->mapToGroups(function ($ticket) {
+        // Livewire 3 may auto-resolve the route parameter as a TicketOrder
+        // model via implicit route model binding. Handle either case.
+        if ($key instanceof TicketOrder) {
+            $orderModel = $key->loadMissing('tickets.ticketType');
+        } else {
+            $orderModel = TicketOrder::with('tickets.ticketType')->findOrFail($key);
+        }
+
+        $this->order = $orderModel;
+        $this->paid = $orderModel->paid;
+        $this->totalPrice = $orderModel->total;
+        $this->groupedTickets = $orderModel->tickets->mapToGroups(function ($ticket) {
             $typeName = optional($ticket->ticketType)->name ?? 'Unknown Type';
             return [$typeName => $ticket];
         });

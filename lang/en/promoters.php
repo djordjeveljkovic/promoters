@@ -34,6 +34,11 @@ return [
         'cancel_button'             => 'Cancel',
         'update_button'             => 'Update Promoter',
     ],
+    // Short keys used by the promoter edit page header.
+    'edit' => [
+        'page_title' => 'Edit promoter',
+        'main_heading' => 'Edit promoter',
+    ],
     // New keys for Create Promoter page
     'create_form' => [
         'page_title'                => 'Create Promoter',
