@@ -7,7 +7,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         @forelse ($festivals as $f)
             <a href="{{ route('promoter.dashboard', ['festival' => $f->slug]) }}" wire:navigate
-               class="ds-card hover:border-indigo-300 transition-colors block overflow-hidden">
+               class="ds-card hover:border-[color:var(--ds-accent)] transition-colors block overflow-hidden">
                 <div class="h-1.5" style="background: linear-gradient(90deg, {{ $f->primary_color }} 0%, {{ $f->secondary_color }} 100%);"></div>
                 <div class="ds-card-body">
                     <div class="flex items-start justify-between gap-3">

@@ -49,8 +49,13 @@
         @forelse ($festivals as $f)
             <tr>
                 <td>
-                    <div class="row-title">{{ $f->displayName() }}</div>
-                    <div class="row-meta">{{ $f->location ?: '—' }}</div>
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-6 h-6 rounded-md border border-[color:var(--ds-border)] flex-shrink-0" title="{{ __('festivals.card_theme_swatch') }}" style="background: linear-gradient(135deg, {{ $f->primaryColor() }} 0%, {{ $f->secondaryColor() }} 100%);"></span>
+                        <div class="min-w-0">
+                            <div class="row-title truncate">{{ $f->displayName() }}</div>
+                            <div class="row-meta truncate">{{ $f->location ?: '—' }}</div>
+                        </div>
+                    </div>
                 </td>
                 <td class="num">{{ $f->year }}</td>
                 <td>

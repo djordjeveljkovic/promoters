@@ -38,7 +38,7 @@
                         <a href="{{ $href }}" wire:navigate
                            @class([
                                'flex items-center gap-2.5 px-3 py-2 text-[13px] hover:bg-[color:var(--ds-bg-subtle)]',
-                               'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300' => $current && $current->id === $f->id,
+                               'bg-[color:var(--ds-accent-soft)] text-[color:var(--ds-accent-text)]' => $current && $current->id === $f->id,
                            ])>
                             <span class="w-2 h-2 rounded-full flex-shrink-0" style="background: {{ $f->primary_color }}"></span>
                             <span class="flex-1">
@@ -46,7 +46,7 @@
                                 <span class="text-[11px] text-[color:var(--ds-text-muted)]">{{ __($f->status) }}{{ $f->location ? ' · ' . $f->location : '' }}</span>
                             </span>
                             @if ($current && $current->id === $f->id)
-                                <svg class="w-4 h-4 text-indigo-600" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.7 5.3a1 1 0 010 1.4l-7.5 7.5a1 1 0 01-1.4 0L3.3 9.7a1 1 0 011.4-1.4L8.5 12l6.8-6.7a1 1 0 011.4 0z"/></svg>
+                                <svg class="w-4 h-4 text-[color:var(--ds-accent-text)]" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.7 5.3a1 1 0 010 1.4l-7.5 7.5a1 1 0 01-1.4 0L3.3 9.7a1 1 0 011.4-1.4L8.5 12l6.8-6.7a1 1 0 011.4 0z"/></svg>
                             @endif
                         </a>
                     </li>
@@ -57,7 +57,7 @@
             @if ($user?->isSuperAdmin())
                 <div class="p-1.5 border-t border-[color:var(--ds-divider)]">
                     <a href="{{ route('superadmin.festivals.create') }}" wire:navigate
-                       class="block px-3 py-2 text-[13px] text-indigo-600 hover:bg-indigo-50 rounded">
+                       class="block px-3 py-2 text-[13px] text-[color:var(--ds-accent-text)] hover:bg-[color:var(--ds-accent-soft)] rounded">
                         + {{ __('Create new festival') }}
                     </a>
                 </div>

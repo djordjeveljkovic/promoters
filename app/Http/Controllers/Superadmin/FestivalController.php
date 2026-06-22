@@ -58,6 +58,8 @@ class FestivalController extends Controller
     public function store(Request $request)
     {
         $data = $this->validated($request);
+        $data['primary_color']   = Festival::normaliseColor($data['primary_color'] ?? null);
+        $data['secondary_color'] = Festival::normaliseColor($data['secondary_color'] ?? null);
 
         DB::transaction(function () use ($data, $request) {
             if ($request->hasFile('logo')) {
@@ -81,6 +83,8 @@ class FestivalController extends Controller
     public function update(Request $request, Festival $festival)
     {
         $data = $this->validated($request, $festival);
+        $data['primary_color']   = Festival::normaliseColor($data['primary_color'] ?? null);
+        $data['secondary_color'] = Festival::normaliseColor($data['secondary_color'] ?? null);
 
         DB::transaction(function () use ($data, $request, $festival) {
             if ($request->hasFile('logo')) {
@@ -125,8 +129,8 @@ class FestivalController extends Controller
             'location'       => ['nullable', 'string', 'max:160'],
             'start_date'     => ['nullable', 'date'],
             'end_date'       => ['nullable', 'date', 'after_or_equal:start_date'],
-            'primary_color'  => ['nullable', 'string', 'max:7'],
-            'secondary_color'=> ['nullable', 'string', 'max:7'],
+            'primary_color'  => ['nullable', 'string', 'regex:/^#?[0-9a-fA-F]{6}$/'],
+            'secondary_color'=> ['nullable', 'string', 'regex:/^#?[0-9a-fA-F]{6}$/'],
             'status'         => ['required', Rule::in(['draft', 'active', 'archived'])],
             'is_public'      => ['nullable', 'boolean'],
             'logo'           => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
@@ -134,6 +138,16 @@ class FestivalController extends Controller
             'start_date' => 'start date',
             'end_date'   => 'end date',
         ]);
+    }
+
+    /**
+     * Strip the leading "#" from the user-submitted colour values so
+     * they match the format the database migration expects (#rrggbb).
+     * If the user omits the prefix (e.g. "ff2d92"), add it back.
+     */
+    private function normaliseColor(?string $value): ?string
+    {
+        return Festival::normaliseColor($value);
     }
 
     private function storeLogo(Request $request): string

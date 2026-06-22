@@ -33,7 +33,7 @@
             </x-ds.field>
 
             <x-ds.field :label="__('ticket_types.create_form.photo_label')" name="photo" :hint="__('ticket_types.create_form.photo_help_text')" :error="$errors->first('photo')">
-                <input type="file" name="photo" id="photo" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml" class="block w-full text-sm text-[color:var(--ds-text)] border border-[color:var(--ds-border)] rounded-lg bg-[color:var(--ds-surface)] file:mr-3 file:py-2 file:px-4 file:rounded-l-md file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                <input type="file" name="photo" id="photo" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml" class="block w-full text-sm text-[color:var(--ds-text)] border border-[color:var(--ds-border)] rounded-lg bg-[color:var(--ds-surface)] file:mr-3 file:py-2 file:px-4 file:rounded-l-md file:border-0 file:text-sm file:font-medium file:bg-[color:var(--ds-accent-soft)] file:text-[color:var(--ds-accent-text)] hover:file:bg-[color:var(--ds-accent-soft-2)]">
             </x-ds.field>
 
             <fieldset class="rounded-lg border border-[color:var(--ds-border)] p-4 space-y-3">

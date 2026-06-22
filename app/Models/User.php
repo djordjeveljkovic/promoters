@@ -42,6 +42,16 @@ class User extends Authenticatable
     }
 
     /**
+     * Festival assignments (through the festival_user pivot).
+     * Use `$user->festivalAssignments` to access the FestivalUser rows
+     * directly (with role_in_festival, assigned_by, etc).
+     */
+    public function festivalAssignments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(FestivalUser::class);
+    }
+
+    /**
      * Festivals this user is assigned to (through the festival_user pivot).
      * Superadmins implicitly have access to every festival — see
      * {@see accessibleFestivals()}.
@@ -266,5 +276,81 @@ class User extends Authenticatable
             return $this->role === 'sub_promoter';
         }
         return $this->roleInFestival($festivalId) === 'sub_promoter';
+    }
+
+    /**
+     * Is this user a "promoter manager" on the given festival (or any
+     * festival when null)?  A promoter manager is a regular promoter that
+     * is allowed to create their own sub-promoters and split their
+     * commission with them.
+     */
+    public function isPromoterManager(?int $festivalId = null): bool
+    {
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+        if ($festivalId === null) {
+            return $this->festivalAssignments()
+                ->where('role_in_festival', 'promoter_manager')
+                ->exists();
+        }
+        return $this->festivalAssignments()
+            ->where('festival_id', $festivalId)
+            ->where('role_in_festival', 'promoter_manager')
+            ->exists();
+    }
+
+    /**
+     * Convenience: returns true when the user has the plain "promoter"
+     * role (not manager, not sub-promoter) on the given festival.
+     */
+    public function isRegularPromoter(?int $festivalId = null): bool
+    {
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+        if ($festivalId === null) {
+            return $this->festivalAssignments()
+                ->where('role_in_festival', 'promoter')
+                ->exists();
+        }
+        return $this->festivalAssignments()
+            ->where('festival_id', $festivalId)
+            ->where('role_in_festival', 'promoter')
+            ->exists();
+    }
+
+    /**
+     * ManagerCommission overrides the admin set for this user (as a
+     * promoter manager) for each ticket type.  Only relevant for users
+     * with the `promoter_manager` role; falls back to TicketCommission
+     * for everyone else.
+     */
+    public function managerCommissions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasManyThrough(
+            ManagerCommission::class,
+            FestivalUser::class,
+            'user_id',           // FK on festival_user
+            'festival_user_id',  // FK on manager_commissions
+            'id',                // local key on users
+            'id'                 // local key on festival_user
+        );
+    }
+
+    /**
+     * SubPromoterCommission rows set for this user when they act as a
+     * sub-promoter.
+     */
+    public function subPromoterCommissions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasManyThrough(
+            SubPromoterCommission::class,
+            FestivalUser::class,
+            'user_id',
+            'festival_user_id',
+            'id',
+            'id'
+        );
     }
 }

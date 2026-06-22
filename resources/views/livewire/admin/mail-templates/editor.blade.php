@@ -227,7 +227,7 @@
                     <ul class="space-y-1 text-xs max-h-72 overflow-y-auto pr-1">
                         @foreach ($this->variables as $var => $desc)
                             <li class="flex flex-col py-1 border-b border-[color:var(--ds-divider)] last:border-b-0">
-                                <code class="font-mono text-indigo-600 dark:text-indigo-300 cursor-pointer"
+                                <code class="font-mono text-[color:var(--ds-accent-text)] cursor-pointer"
                                       title="{{ __('mail_templates.variables.copy_title') }}"
                                       onclick="navigator.clipboard?.writeText('{{ '$' }}{{ $var }}')">
                                     {{ '$' }}{{ $var }}

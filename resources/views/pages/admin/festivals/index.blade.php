@@ -7,17 +7,20 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         @forelse ($festivals as $f)
             <a href="{{ route('admin.dashboard', ['festival' => $f->slug]) }}" wire:navigate
-               class="ds-card hover:border-indigo-300 transition-colors block overflow-hidden">
-                <div class="h-1.5" style="background: linear-gradient(90deg, {{ $f->primary_color }} 0%, {{ $f->secondary_color }} 100%);"></div>
+               class="ds-card hover:border-[color:var(--ds-accent)] transition-colors block overflow-hidden">
+                <div class="h-1.5" style="background: linear-gradient(90deg, {{ $f->primaryColor() }} 0%, {{ $f->secondaryColor() }} 100%);"></div>
                 <div class="ds-card-body">
                     <div class="flex items-start justify-between gap-3">
                         <div class="min-w-0">
                             <h2 class="text-base font-semibold text-[color:var(--ds-text)] truncate">{{ $f->displayName() }}</h2>
                             <p class="text-xs text-[color:var(--ds-text-muted)] truncate">{{ $f->location ?: '—' }}</p>
                         </div>
-                        <x-ds.badge :variant="match($f->status) { 'active' => 'success', 'draft' => 'warning', default => 'neutral' }" size="sm" dot>
-                            {{ __(ucfirst($f->status)) }}
-                        </x-ds.badge>
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                            <span class="w-5 h-5 rounded-md border border-[color:var(--ds-border)]" title="{{ __('festivals.card_theme_swatch') }}" style="background: linear-gradient(135deg, {{ $f->primaryColor() }} 0%, {{ $f->secondaryColor() }} 100%);"></span>
+                            <x-ds.badge :variant="match($f->status) { 'active' => 'success', 'draft' => 'warning', default => 'neutral' }" size="sm" dot>
+                                {{ __(ucfirst($f->status)) }}
+                            </x-ds.badge>
+                        </div>
                     </div>
                     @if ($f->tagline)
                         <p class="mt-3 text-sm text-[color:var(--ds-text-muted)] line-clamp-2">{{ $f->tagline }}</p>

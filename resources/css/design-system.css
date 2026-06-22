@@ -132,6 +132,16 @@
    LIGHT THEME TOKENS
    ========================================================================= */
 :root {
+    /* Per-festival theme overrides. The sidebar layout writes
+       `--festival-primary` (and optionally `--festival-secondary`) on
+       the page wrapper, so the entire UI picks up the festival's brand
+       colour. Falls back to the indigo accent if no festival is active. */
+    --festival-primary:   var(--color-accent-600);
+    --festival-secondary: var(--color-accent-400);
+    --festival-is-custom: 0; /* set to 1 on the wrapper when a festival has
+                                explicitly chosen colours, so the brand mark
+                                in the sidebar can show the swatch */
+
     --ds-bg:           var(--color-neutral-50);
     --ds-bg-subtle:    var(--color-neutral-100);
     --ds-surface:      var(--color-neutral-0);
@@ -143,14 +153,19 @@
     --ds-border:       var(--color-neutral-200);
     --ds-border-strong:var(--color-neutral-300);
     --ds-divider:      var(--color-neutral-100);
-    --ds-accent:       var(--color-accent-600);
-    --ds-accent-hover: var(--color-accent-700);
-    --ds-accent-soft:  var(--color-accent-50);
-    --ds-accent-text:  var(--color-accent-700);
+    /* The accent colour is derived from the festival's primary, so
+       every component automatically follows the theme. */
+    --ds-accent:        var(--festival-primary);
+    --ds-accent-strong: color-mix(in oklab, var(--festival-primary) 80%, black);
+    --ds-accent-hover:  color-mix(in oklab, var(--festival-primary) 85%, black);
+    --ds-accent-soft:   color-mix(in oklab, var(--festival-primary) 12%, transparent);
+    --ds-accent-soft-2: color-mix(in oklab, var(--festival-primary) 6%, transparent);
+    --ds-accent-text:   color-mix(in oklab, var(--festival-primary) 70%, black);
+    --ds-accent-on:     var(--color-neutral-0); /* text colour ON accent bg */
     --ds-sidebar:      var(--color-neutral-0);
     --ds-sidebar-text: var(--color-neutral-700);
-    --ds-sidebar-active-bg: var(--color-accent-50);
-    --ds-sidebar-active-text: var(--color-accent-700);
+    --ds-sidebar-active-bg: var(--ds-accent-soft);
+    --ds-sidebar-active-text: var(--ds-accent-text);
     --ds-topbar:       var(--color-neutral-0);
     --ds-shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
     --ds-shadow-md: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.06);
@@ -172,14 +187,19 @@
     --ds-border:       var(--color-neutral-800);
     --ds-border-strong:var(--color-neutral-700);
     --ds-divider:      var(--color-neutral-800);
-    --ds-accent:       var(--color-accent-500);
-    --ds-accent-hover: var(--color-accent-400);
-    --ds-accent-soft:  rgba(99, 102, 241, 0.12);
-    --ds-accent-text:  var(--color-accent-300);
+    /* In dark mode the festival colour is lightened slightly so it
+       reads well on a dark background. */
+    --ds-accent:        color-mix(in oklab, var(--festival-primary) 80%, white);
+    --ds-accent-strong: color-mix(in oklab, var(--festival-primary) 90%, white);
+    --ds-accent-hover:  color-mix(in oklab, var(--festival-primary) 70%, white);
+    --ds-accent-soft:   color-mix(in oklab, var(--festival-primary) 18%, transparent);
+    --ds-accent-soft-2: color-mix(in oklab, var(--festival-primary) 10%, transparent);
+    --ds-accent-text:   color-mix(in oklab, var(--festival-primary) 60%, white);
+    --ds-accent-on:     var(--color-neutral-900);
     --ds-sidebar:      var(--color-neutral-900);
     --ds-sidebar-text: var(--color-neutral-300);
-    --ds-sidebar-active-bg: rgba(99, 102, 241, 0.12);
-    --ds-sidebar-active-text: var(--color-accent-300);
+    --ds-sidebar-active-bg: var(--ds-accent-soft);
+    --ds-sidebar-active-text: var(--ds-accent-text);
     --ds-topbar:       var(--color-neutral-900);
     --ds-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
     --ds-shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.45);

@@ -12,6 +12,22 @@
         </x-slot:actions>
     </x-ds.page-header>
 
+    @auth
+        @if (auth()->user()->isPromoterManager($festival?->id))
+            <x-ds.alert variant="accent" class="mb-4">
+                <div class="flex items-center justify-between gap-3 flex-wrap">
+                    <div>
+                        <div class="font-semibold">{{ __('You are a promoter manager on this festival') }}</div>
+                        <div class="text-sm">{{ __('You can create sub-promoters and set their commission. Your payout is reduced by what you pay them.') }}</div>
+                    </div>
+                    <x-ds.button variant="primary" :href="route('promoter.sub-promoters.index', $festival)" wire:navigate>
+                        {{ __('Manage sub-promoters') }}
+                    </x-ds.button>
+                </div>
+            </x-ds.alert>
+        @endif
+    @endauth
+
     {{-- Financial overview --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <x-ds.stat

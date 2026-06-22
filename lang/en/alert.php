@@ -50,6 +50,14 @@ return [
     'assignment_added'              => 'User assigned to the festival.',
     'assignment_removed'            => 'User removed from the festival.',
 
+    /* ---- Promoter manager / sub-promoter commission ---- */
+    'sub_promoter_created'                  => 'Sub-promoter :name created. You can now set their commission rates.',
+    'commissions_saved'                    => 'Commission overrides saved.',
+    'sub_commissions_saved'                 => 'Sub-promoter commission rates saved.',
+    'sub_commission_cannot_exceed_manager'  => 'Sub-promoter commission cannot exceed your own commission of :manager RSD for this ticket type.',
+    'promoter_promoted_to_manager'          => ':name is now a promoter manager. They can create their own sub-promoters.',
+    'promoter_demoted'                       => ':name was demoted to a regular promoter.',
+
     /* ---- User management ---- */
     'user_created'           => 'User created successfully.',
     'user_updated'           => 'User updated successfully.',

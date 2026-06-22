@@ -51,6 +51,14 @@ return [
     'assignment_added'              => 'Korisnik je dodeljen festivalu.',
     'assignment_removed'            => 'Korisnik je uklonjen sa festivala.',
 
+    /* ---- Promoter menadžer / provizije sub-promotera ---- */
+    'sub_promoter_created'                  => 'Sub-promoter :name je kreiran. Sada možete da podesite provizije.',
+    'commissions_saved'                    => 'Provizije su sačuvane.',
+    'sub_commissions_saved'                => 'Provizije sub-promotera su sačuvane.',
+    'sub_commission_cannot_exceed_manager'  => 'Provizija sub-promotera ne može biti veća od vaše provizije (:manager RSD) za ovaj tip karte.',
+    'promoter_promoted_to_manager'          => ':name je sada promoter menadžer. Može da kreira svoje sub-promotere.',
+    'promoter_demoted'                      => ':name je vraćen na običnog promotera.',
+
     /* ---- Upravljanje korisnicima ---- */
     'user_created'           => 'Korisnik je uspešno kreiran.',
     'user_updated'           => 'Korisnik je uspešno ažuriran.',

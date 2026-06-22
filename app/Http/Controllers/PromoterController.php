@@ -160,4 +160,41 @@ class PromoterController extends Controller
     {
         return view('pages.promoters.help');
     }
+
+    /**
+     * Create a new sub-promoter under the current promoter manager.
+     * Only available to users whose role_in_festival on the given
+     * festival is `promoter_manager` — plain `promoter` users get a 403.
+     */
+    public function createSubPromoter(Request $request, \App\Models\Festival $festival)
+    {
+        $manager = $request->user();
+        if (!$manager->isPromoterManager($festival->id)) {
+            abort(403, __('alert.role_unauthorized'));
+        }
+
+        $data = $request->validate([
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8'],
+        ]);
+
+        $sub = \App\Models\User::create([
+            'name'     => $data['name'],
+            'email'    => $data['email'],
+            'password' => \Illuminate\Support\Facades\Hash::make($data['password']),
+            'role'     => 'sub_promoter',
+            'parent_id'=> $manager->id,
+        ]);
+
+        $sub->festivals()->attach($festival->id, [
+            'role_in_festival' => 'sub_promoter',
+            'assigned_by'      => $manager->id,
+            'assigned_at'      => now(),
+        ]);
+
+        return redirect()
+            ->route('promoter.sub-promoters.index', ['festival' => $festival->slug])
+            ->with('success', __('alert.sub_promoter_created', ['name' => $sub->name]));
+    }
 }

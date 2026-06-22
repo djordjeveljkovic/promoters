@@ -3,7 +3,9 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminOrderController;
 use App\Http\Controllers\Admin\MailTemplatePreviewController;
+use App\Http\Controllers\Admin\PromoterManagerController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\Promoter\SubPromoterCommissionController;
 use App\Http\Controllers\PromoterController;
 use App\Http\Controllers\SubPromoterController;
 use App\Livewire\Admin\MailTemplates\Editor as MailTemplateEditor;
@@ -137,6 +139,12 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/promoter/edit/{id}', [AdminController::class, 'updatePromoter'])->name('promoters.update');
         Route::delete('/promoter/{id}', [AdminController::class, 'deletePromoter'])->name('promoters.destroy');
 
+        // Promote/demote a promoter to/from `promoter_manager` on this festival.
+        Route::put('/promoter/{id}/make-manager', [AdminController::class, 'makeManager'])
+            ->name('promoters.make-manager');
+        Route::put('/promoter/{id}/remove-manager', [AdminController::class, 'removeManager'])
+            ->name('promoters.remove-manager');
+
         // Orders inside a festival
         Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
         Route::get('/orders/{order}', OrderDetails::class)->name('orders.show');
@@ -157,6 +165,14 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/ticket-types/{id}/price', [TicketController::class, 'setPrice']);
         Route::put('/commissions', [AdminController::class, 'setCommission']);
 
+        // Promoter managers + their commission overrides.
+        Route::get('/promoter-managers', [PromoterManagerController::class, 'index'])
+            ->name('promoter-managers.index');
+        Route::get('/promoter-managers/{manager}', [PromoterManagerController::class, 'show'])
+            ->name('promoter-managers.show');
+        Route::put('/promoter-managers/{manager}', [PromoterManagerController::class, 'update'])
+            ->name('promoter-managers.update');
+
         // Mail templates scoped to this festival (admin can override the
         // global defaults for their event without touching the platform-wide copy)
         Route::get('/mail-templates', MailTemplateEditor::class)
@@ -172,8 +188,20 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/order/create', [OrderController::class, 'create'])->name('orders.create');
         Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
 
-        // Sub-promoter creation (only the lead promoter or admin can do this)
-        Route::post('/sub-promoters', [PromoterController::class, 'createSubPromoter']);
+        // Sub-promoter creation (only promoter managers can do this — the
+        // controller enforces the role check).
+        Route::post('/sub-promoters', [PromoterController::class, 'createSubPromoter'])
+            ->name('sub-promoters.store');
+
+        // Sub-promoter commission management (promoter manager only).
+        Route::middleware('role:promoter|superadmin|admin')->group(function () {
+            Route::get('/sub-promoters', [SubPromoterCommissionController::class, 'index'])
+                ->name('sub-promoters.index');
+            Route::get('/sub-promoters/{subPromoter}', [SubPromoterCommissionController::class, 'show'])
+                ->name('sub-promoters.show');
+            Route::put('/sub-promoters/{subPromoter}', [SubPromoterCommissionController::class, 'update'])
+                ->name('sub-promoters.update');
+        });
     });
 
     /* ----------  Sub-promoter area (legacy routes preserved) ---------- */

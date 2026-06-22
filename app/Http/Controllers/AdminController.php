@@ -317,4 +317,63 @@ class AdminController extends Controller
 
         return redirect()->route('admin.promoters.edit', $id)->with('success', __('alert.promoter_updated_success'));
     }
+
+    /**
+     * Promote an existing festival promoter to a "promoter manager" so
+     * they can create their own sub-promoters and split their commission
+     * with them.  Idempotent: if the user already has a manager pivot
+     * row, we re-activate it.
+     */
+    public function makeManager(Request $request, Festival $festival, $id)
+    {
+        $user = $request->user();
+        if (!$user->isFestivalAdmin($festival->id)) {
+            abort(403, __('alert.role_unauthorized'));
+        }
+
+        $promoter = User::findOrFail($id);
+
+        // Re-attach (or update) the pivot with role_in_festival = promoter_manager.
+        $existing = $festival->users()
+            ->wherePivot('user_id', $promoter->id)
+            ->first();
+
+        if ($existing) {
+            $festival->users()->updateExistingPivot($promoter->id, [
+                'role_in_festival' => 'promoter_manager',
+                'assigned_by'      => $user->id,
+                'assigned_at'      => now(),
+            ]);
+        } else {
+            $festival->users()->attach($promoter->id, [
+                'role_in_festival' => 'promoter_manager',
+                'assigned_by'      => $user->id,
+                'assigned_at'      => now(),
+            ]);
+        }
+
+        return back()->with('success', __('alert.promoter_promoted_to_manager', ['name' => $promoter->name]));
+    }
+
+    /**
+     * Demote a promoter manager back to a regular promoter on this
+     * festival.  We close the manager pivot (set valid_to) so historical
+     * commission overrides are preserved.
+     */
+    public function removeManager(Request $request, Festival $festival, $id)
+    {
+        $user = $request->user();
+        if (!$user->isFestivalAdmin($festival->id)) {
+            abort(403, __('alert.role_unauthorized'));
+        }
+
+        $promoter = User::findOrFail($id);
+
+        // Just downgrade the role_in_festival on the existing pivot row.
+        $festival->users()->updateExistingPivot($promoter->id, [
+            'role_in_festival' => 'promoter',
+        ]);
+
+        return back()->with('success', __('alert.promoter_demoted', ['name' => $promoter->name]));
+    }
 }

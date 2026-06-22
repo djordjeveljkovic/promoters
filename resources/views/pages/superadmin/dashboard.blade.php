@@ -80,7 +80,7 @@
                 <ul class="divide-y divide-[color:var(--ds-divider)]">
                     @foreach ($recentFestivals as $f)
                         <li class="flex items-center justify-between py-2.5 first:pt-0 last:pb-0">
-                            <a href="{{ route('superadmin.festivals.edit', $f) }}" wire:navigate class="text-sm font-medium text-[color:var(--ds-text)] hover:text-indigo-600 truncate">
+                            <a href="{{ route('superadmin.festivals.edit', $f) }}" wire:navigate class="text-sm font-medium text-[color:var(--ds-text)] hover:text-[color:var(--ds-accent-text)] truncate">
                                 {{ $f->displayName() }}
                             </a>
                             <span class="text-xs text-[color:var(--ds-text-muted)] flex-shrink-0 ml-3">{{ $f->created_at->diffForHumans() }}</span>

@@ -26,8 +26,6 @@
         })();
     </script>
 </head>
-<body class="ds-app">
-
 @php
     /** @var \App\Models\User $u */
     $u = auth()->user();
@@ -48,17 +46,34 @@
     $festivalParam = $currentFestival ? ['festival' => $currentFestival->slug] : [];
 @endphp
 
+<body class="ds-app" @if ($currentFestival) style="--festival-primary: {{ $currentFestival->primaryColor() }}; --festival-secondary: {{ $currentFestival->secondaryColor() }}; --festival-is-custom: 1;" @endif>
+
 <div class="min-h-screen flex">
 
     {{-- ===================== Sidebar ===================== --}}
     <aside class="hidden lg:flex w-64 flex-col border-r border-[color:var(--ds-border)] bg-[color:var(--ds-sidebar)] sticky top-0 h-screen">
 
         {{-- Brand --}}
-        <a href="{{ route($homeRoute) }}" wire:navigate class="flex items-center gap-2 px-5 h-16 border-b border-[color:var(--ds-divider)]">
-            <div class="w-8 h-8 rounded-md bg-indigo-600 text-white flex items-center justify-center font-semibold">P</div>
-            <div class="leading-tight">
-                <div class="text-sm font-semibold text-[color:var(--ds-text)]">{{ config('app.name', 'Promoteri') }}</div>
-                <div class="text-[11px] text-[color:var(--ds-text-muted)] uppercase tracking-wider">Festival OS</div>
+        <a href="{{ route($homeRoute) }}" wire:navigate class="flex items-center gap-2.5 px-5 h-16 border-b border-[color:var(--ds-divider)]">
+            @if ($currentFestival)
+                <div class="relative w-9 h-9 rounded-md flex items-center justify-center font-semibold" style="background: linear-gradient(135deg, {{ $currentFestival->primaryColor() }} 0%, {{ $currentFestival->secondaryColor() }} 100%); color: {{ $currentFestival->contrastColorOn($currentFestival->primaryColor()) }};">
+                    <span>{{ mb_substr($currentFestival->name, 0, 1) }}</span>
+                    <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-[color:var(--ds-sidebar)]" style="background: {{ $currentFestival->secondaryColor() }};"></span>
+                </div>
+            @else
+                <div class="w-9 h-9 rounded-md flex items-center justify-center font-semibold" style="background: linear-gradient(135deg, var(--festival-primary) 0%, var(--festival-secondary) 100%); color: var(--ds-accent-on);">
+                    <span>P</span>
+                </div>
+            @endif
+            <div class="leading-tight min-w-0">
+                <div class="text-sm font-semibold text-[color:var(--ds-text)] truncate">{{ $currentFestival?->name ?? config('app.name', 'Promoteri') }}</div>
+                <div class="text-[11px] text-[color:var(--ds-text-muted)] uppercase tracking-wider truncate">
+                    @if ($currentFestival)
+                        {{ $currentFestival->year ?? '' }} · {{ $currentFestival->location ?? __('Festival') }}
+                    @else
+                        Festival OS
+                    @endif
+                </div>
             </div>
         </a>
 
@@ -95,7 +110,8 @@
                         @if ($currentFestival)
                             <x-ds.nav-item :href="route('admin.dashboard', $festivalParam)" :active="request()->routeIs('admin.dashboard')" icon="home">{{ __('Dashboard') }}</x-ds.nav-item>
                             <x-ds.nav-item :href="route('admin.ticket-types.index', $festivalParam)" :active="request()->routeIs('admin.ticket-types.*')" icon="ticket">{{ __('Ticket types') }}</x-ds.nav-item>
-                            <x-ds.nav-item :href="route('admin.promoters.index', $festivalParam)" :active="request()->routeIs('admin.promoters.*')" icon="user">{{ __('Promoters') }}</x-ds.nav-item>
+                            <x-ds.nav-item :href="route('admin.promoters.index', $festivalParam)" :active="request()->routeIs('admin.promoters.*') && !request()->routeIs('admin.promoter-managers.*')" icon="user">{{ __('Promoters') }}</x-ds.nav-item>
+                            <x-ds.nav-item :href="route('admin.promoter-managers.index', $festivalParam)" :active="request()->routeIs('admin.promoter-managers.*')" icon="user-cog">{{ __('Manager rates') }}</x-ds.nav-item>
                             <x-ds.nav-item :href="route('admin.orders.index', $festivalParam)" :active="request()->routeIs('admin.orders.*')" icon="shopping-bag">{{ __('Orders') }}</x-ds.nav-item>
                             <x-ds.nav-item :href="route('admin.mail-templates.index', $festivalParam)" :active="request()->routeIs('admin.mail-templates.*')" icon="envelope">{{ __('Mail templates') }}</x-ds.nav-item>
                         @else
@@ -114,7 +130,10 @@
                         @if ($currentFestival)
                             <x-ds.nav-item :href="route('promoter.dashboard', $festivalParam)" :active="request()->routeIs('promoter.dashboard')" icon="home">{{ __('Dashboard') }}</x-ds.nav-item>
                             <x-ds.nav-item :href="route('promoter.orders.create', $festivalParam)" :active="request()->routeIs('promoter.orders.create')" icon="plus-circle">{{ __('New order') }}</x-ds.nav-item>
-                            <x-ds.nav-item :href="route('promoter.orders.index', $festivalParam)" :active="request()->routeIs('promoter.orders.*')" icon="shopping-bag">{{ __('My orders') }}</x-ds.nav-item>
+                            <x-ds.nav-item :href="route('promoter.orders.index', $festivalParam)" :active="request()->routeIs('promoter.orders.*') && !request()->routeIs('promoter.sub-promoters.*')" icon="shopping-bag">{{ __('My orders') }}</x-ds.nav-item>
+                            @if ($u->isPromoterManager($currentFestival?->id))
+                                <x-ds.nav-item :href="route('promoter.sub-promoters.index', $festivalParam)" :active="request()->routeIs('promoter.sub-promoters.*')" icon="users">{{ __('Sub-promoters') }}</x-ds.nav-item>
+                            @endif
                             <x-ds.nav-item :href="route('promoter.help', $festivalParam)" :active="request()->routeIs('promoter.help')" icon="question-mark-circle">{{ __('Help') }}</x-ds.nav-item>
                         @else
                             <x-ds.nav-item :href="route('promoter.festivals.index')" :active="request()->routeIs('promoter.festivals.*')" icon="calendar">{{ __('All festivals') }}</x-ds.nav-item>
