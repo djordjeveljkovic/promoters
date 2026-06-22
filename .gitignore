@@ -22,3 +22,7 @@ yarn-error.log
 /.vscode
 /.zed
 storage/logs/
+
+# Laravel log file was historically tracked; keep it ignored going
+# forward so the .gitignore rule actually has effect.
+storage/logs/laravel.log
