@@ -83,4 +83,7 @@ return [
     'no_festival_access'     => 'Nemate pristup ovom festivalu.',
     'role_unauthorized'      => 'Niste ovlašćeni za ovu akciju.',
     'no_festival_in_scope'   => 'Ova akcija zahteva da bude izabran festival. Molimo pristupite preko stranice festivala.',
+    // P-NEW: sub-promoter management — friendlier messages than the generic 403.
+    'sub_promoter_manager_required' => 'Samo promoter menadžer festivala :festival može da upravlja pod-promoterima. Zamolite administratora festivala da vas prvo unapredi.',
+    'sub_promoter_owner_required'   => 'Možete upravljati samo pod-promoterima koje ste sami kreirali. :name pripada drugom menadžeru.',
 ];

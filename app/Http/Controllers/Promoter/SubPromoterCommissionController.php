@@ -41,7 +41,9 @@ class SubPromoterCommissionController extends Controller
         $festival = $this->resolveFestival($request, $festival);
         $manager = $request->user();
         if (!$manager->isPromoterManager($festival->id)) {
-            abort(403, __('alert.role_unauthorized'));
+            abort(403, __('alert.sub_promoter_manager_required', [
+                'festival' => $festival->displayName(),
+            ]));
         }
 
         $subPromoters = $manager->subPromoters()
@@ -246,14 +248,29 @@ class SubPromoterCommissionController extends Controller
     /**
      * Make sure the calling user is the parent manager of the sub-promoter
      * on the given festival.
+     *
+     * The two checks are deliberately separated with distinct messages
+     * so the user (or an admin debugging "why am I getting a 403?")
+     * can tell what went wrong:
+     *
+     *   - "must be a promoter manager on this festival" — happens when
+     *     a plain promoter tries to access the endpoint, or when a
+     *     manager tries the URL on a festival they aren't promoted on.
+     *   - "must be the parent of this sub-promoter" — happens when a
+     *     manager A tries to edit a sub-promoter that belongs to
+     *     manager B (which is correct: you can only manage your own).
      */
     private function authorize(User $manager, Festival $festival, User $subPromoter): void
     {
         if (!$manager->isPromoterManager($festival->id)) {
-            abort(403, __('alert.role_unauthorized'));
+            abort(403, __('alert.sub_promoter_manager_required', [
+                'festival' => $festival->displayName(),
+            ]));
         }
         if ($subPromoter->parent_id !== $manager->id) {
-            abort(403, __('alert.role_unauthorized'));
+            abort(403, __('alert.sub_promoter_owner_required', [
+                'name' => $subPromoter->name,
+            ]));
         }
     }
 

@@ -82,4 +82,7 @@ return [
     'no_festival_access'     => 'You do not have access to this festival.',
     'role_unauthorized'      => 'You are not authorized to perform this action.',
     'no_festival_in_scope'   => 'This action requires a festival to be selected. Please navigate via a festival page.',
+    // P-NEW: sub-promoter management — friendlier messages than the generic 403.
+    'sub_promoter_manager_required' => 'Only a promoter manager of :festival can manage sub-promoters. Ask a festival admin to promote you first.',
+    'sub_promoter_owner_required'   => 'You can only manage sub-promoters you created yourself. :name belongs to another manager.',
 ];

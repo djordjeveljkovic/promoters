@@ -170,7 +170,9 @@ class PromoterController extends Controller
     {
         $manager = $request->user();
         if (!$manager->isPromoterManager($festival->id)) {
-            abort(403, __('alert.role_unauthorized'));
+            abort(403, __('alert.sub_promoter_manager_required', [
+                'festival' => $festival->displayName(),
+            ]));
         }
 
         $data = $request->validate([
