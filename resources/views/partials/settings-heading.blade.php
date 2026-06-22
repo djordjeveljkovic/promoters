@@ -1,5 +1,4 @@
-<div class="relative mb-6 w-full">
-    <flux:heading size="xl" level="1">{{ __('navigation.usermenu.settings') }}</flux:heading>
-    <flux:subheading size="lg" class="mb-6">{{ __('navigation.usermenu.settingssubmenu') }}</flux:subheading>
-    <flux:separator variant="subtle" />
+<div class="mb-6">
+    <h1 class="ds-page-title">{{ __('navigation.usermenu.settings') }}</h1>
+    <p class="ds-page-subtitle">{{ __('navigation.usermenu.settingssubmenu') }}</p>
 </div>

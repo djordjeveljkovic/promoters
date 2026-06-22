@@ -1,43 +1,40 @@
 <x-layouts.app :title="__('Your festivals')">
-    <div class="p-6 space-y-6">
-        <div>
-            <h1 class="text-2xl font-bold">{{ __('Your festivals') }}</h1>
-            <p class="text-sm text-gray-500">{{ __('Pick a festival to start selling tickets for.') }}</p>
-        </div>
+    <x-ds.page-header
+        :title="__('Your festivals')"
+        :subtitle="__('Pick a festival to start selling tickets for.')"
+    />
 
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            @forelse ($festivals as $f)
-                <a href="{{ route('promoter.dashboard', ['festival' => $f->slug]) }}"
-                   class="block rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:shadow-md transition overflow-hidden">
-                    <div class="h-2" style="background: linear-gradient(90deg, {{ $f->primary_color }} 0%, {{ $f->secondary_color }} 100%);"></div>
-                    <div class="p-5">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h2 class="text-lg font-bold">{{ $f->displayName() }}</h2>
-                                <p class="text-xs text-gray-500">{{ $f->location }}</p>
-                            </div>
-                            <span class="text-xs px-2 py-1 rounded
-                                @switch($f->status)
-                                    @case('active')   bg-green-100 text-green-800 @break
-                                    @case('draft')    bg-yellow-100 text-yellow-800 @break
-                                    @case('archived') bg-gray-200 text-gray-700 @break
-                                @endswitch
-                            ">{{ __($f->status) }}</span>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        @forelse ($festivals as $f)
+            <a href="{{ route('promoter.dashboard', ['festival' => $f->slug]) }}" wire:navigate
+               class="ds-card hover:border-indigo-300 transition-colors block overflow-hidden">
+                <div class="h-1.5" style="background: linear-gradient(90deg, {{ $f->primary_color }} 0%, {{ $f->secondary_color }} 100%);"></div>
+                <div class="ds-card-body">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <h2 class="text-base font-semibold text-[color:var(--ds-text)] truncate">{{ $f->displayName() }}</h2>
+                            <p class="text-xs text-[color:var(--ds-text-muted)] truncate">{{ $f->location ?: '—' }}</p>
                         </div>
-                        @if ($f->tagline)
-                            <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">{{ $f->tagline }}</p>
-                        @endif
-                        <div class="mt-3 flex items-center gap-4 text-xs text-gray-500">
-                            <span>📦 {{ $f->ticket_types_count }} {{ __('navigation.sidebar.ticket_types') }}</span>
-                            <span>🧾 {{ $f->orders_count }} {{ __('navigation.sidebar.sales') }}</span>
-                        </div>
+                        <x-ds.badge :variant="match($f->status) { 'active' => 'success', 'draft' => 'warning', default => 'neutral' }" size="sm" dot>
+                            {{ __(ucfirst($f->status)) }}
+                        </x-ds.badge>
                     </div>
-                </a>
-            @empty
-                <div class="col-span-full text-center text-gray-500 py-12">
-                    {{ __('You have not been assigned to any festival yet.') }}
+                    @if ($f->tagline)
+                        <p class="mt-3 text-sm text-[color:var(--ds-text-muted)] line-clamp-2">{{ $f->tagline }}</p>
+                    @endif
+                    <div class="mt-3 flex items-center gap-4 text-xs text-[color:var(--ds-text-muted)]">
+                        <span>📦 {{ $f->ticket_types_count }} {{ __('ticket types') }}</span>
+                        <span>🧾 {{ $f->orders_count }} {{ __('navigation.sidebar.sales') }}</span>
+                    </div>
                 </div>
-            @endforelse
-        </div>
+            </a>
+        @empty
+            <div class="col-span-full">
+                <x-ds.empty-state
+                    :title="__('You have not been assigned to any festival yet.')"
+                    :message="__('Contact your admin to be added to a festival.')"
+                />
+            </div>
+        @endforelse
     </div>
 </x-layouts.app>

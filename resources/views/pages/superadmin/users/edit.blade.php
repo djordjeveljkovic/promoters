@@ -1,9 +1,17 @@
 <x-layouts.app :title="__('Edit user')">
-    <div class="p-6 max-w-5xl">
-        <h1 class="text-2xl font-bold mb-6">{{ __('Edit user') }} — {{ $user->name }}</h1>
-        <form action="{{ route('superadmin.users.update', $user) }}" method="POST"
-              class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+    <x-ds.page-header
+        :title="__('Edit user')"
+        :subtitle="$user->name"
+    >
+        <x-slot:actions>
+            <x-ds.button variant="ghost" :href="route('superadmin.users.index')" wire:navigate>← {{ __('Back to list') }}</x-ds.button>
+        </x-slot:actions>
+    </x-ds.page-header>
+
+    <x-ds.card class="max-w-2xl">
+        <form method="POST" action="{{ route('superadmin.users.update', $user) }}" class="space-y-5">
+            @method('PUT')
             @include('pages.superadmin.users._form')
         </form>
-    </div>
+    </x-ds.card>
 </x-layouts.app>

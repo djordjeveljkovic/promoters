@@ -4,6 +4,12 @@ return [
     'page_title' => 'Admin Dashboard',
     'main_heading' => 'Admin Analytics Dashboard',
 
+    /* Stat card hints (used by the superadmin dashboard) */
+    'stat_active_festivals'        => ':count active',
+    'stat_users_breakdown'         => ':admins admins · :promoters promoters',
+    'stat_orders_completed'        => ':count completed',
+    'stat_revenue_hint'            => 'From completed orders',
+
     'overall_performance' => [
         'heading' => 'Overall Performance',
         'total_revenue_all_time' => 'Total Revenue (All Time)',

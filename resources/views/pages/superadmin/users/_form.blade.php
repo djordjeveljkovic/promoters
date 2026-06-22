@@ -1,80 +1,54 @@
 @csrf
-@if (isset($user) && $user->exists)
-    @method('PUT')
-@endif
 
-<div class="grid lg:grid-cols-2 gap-6">
-    <div class="space-y-4">
-        <div>
-            <label class="text-sm font-medium block mb-1">{{ __('Name') }} *</label>
-            <input type="text" name="name" required value="{{ old('name', $user->name ?? '') }}"
-                   class="w-full px-3 py-2 border rounded-lg">
-            @error('name') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
-        </div>
-
-        <div>
-            <label class="text-sm font-medium block mb-1">{{ __('Email') }} *</label>
-            <input type="email" name="email" required value="{{ old('email', $user->email ?? '') }}"
-                   class="w-full px-3 py-2 border rounded-lg">
-            @error('email') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
-        </div>
-
-        <div>
-            <label class="text-sm font-medium block mb-1">{{ __('Password') }} {{ isset($user) && $user->exists ? __('(leave blank to keep current)') : '*' }}</label>
-            <input type="password" name="password" minlength="8"
-                   class="w-full px-3 py-2 border rounded-lg" autocomplete="new-password">
-            @error('password') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
-        </div>
-
-        <div>
-            <label class="text-sm font-medium block mb-1">{{ __('Role') }} *</label>
-            <select name="role" required class="w-full px-3 py-2 border rounded-lg">
-                @foreach (['superadmin', 'admin', 'promoter', 'sub_promoter', 'buyer'] as $r)
-                    <option value="{{ $r }}" @selected(old('role', $user->role ?? 'promoter') === $r)>{{ __($r) }}</option>
-                @endforeach
-            </select>
-            <p class="text-xs text-gray-500 mt-1">
-                {{ __('superadmin') }}: {{ __('global, manages all festivals') }}.
-                {{ __('admin') }}: {{ __('per-festival, can be promoted to global by superadmin') }}.
-            </p>
-            @error('role') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
-        </div>
-    </div>
-
-    <div class="space-y-4">
-        <div>
-            <label class="text-sm font-medium block mb-1">{{ __('Festival assignments') }}</label>
-            <p class="text-xs text-gray-500 mb-2">{{ __('Tick the festivals this user can access, then choose their role on each one.') }}</p>
-            <div class="space-y-2 max-h-96 overflow-y-auto pr-1">
-                @foreach ($festivals as $f)
-                    @php
-                        $checked = isset($assignments) && $assignments->has($f->id);
-                        $currentRole = isset($assignments) && $assignments->has($f->id)
-                            ? $assignments->get($f->id)->pivot->role_in_festival
-                            : 'promoter';
-                    @endphp
-                    <div class="flex items-center gap-3 p-2 rounded border border-gray-200 dark:border-gray-700">
-                        <input type="checkbox" name="festivals[]" value="{{ $f->id }}" id="f_{{ $f->id }}"
-                               @checked(old("festivals.$f->id", $checked))>
-                        <label for="f_{{ $f->id }}" class="flex-1 cursor-pointer">
-                            <span class="font-medium">{{ $f->displayName() }}</span>
-                            <span class="ml-2 text-xs text-gray-500">{{ $f->location }}</span>
-                        </label>
-                        <select name="roles[{{ $f->id }}]" class="text-sm px-2 py-1 border rounded">
-                            @foreach (['admin', 'promoter', 'sub_promoter'] as $r)
-                                <option value="{{ $r }}" @selected(old("roles.$f->id", $currentRole) === $r)>{{ __($r) }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    </div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <x-ds.field :label="__('Name')" name="name" :required="true" :error="$errors->first('name')">
+        <input type="text" name="name" value="{{ old('name', $user->name ?? '') }}" class="ds-input" required>
+    </x-ds.field>
+    <x-ds.field :label="__('Email')" name="email" :required="true" :error="$errors->first('email')">
+        <input type="email" name="email" value="{{ old('email', $user->email ?? '') }}" class="ds-input" required>
+    </x-ds.field>
 </div>
 
-<div class="mt-6 flex items-center gap-3">
-    <button class="px-5 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700">
-        {{ isset($user) && $user->exists ? __('Save changes') : __('Create user') }}
-    </button>
-    <a href="{{ route('superadmin.users.index') }}" class="px-5 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">{{ __('Cancel') }}</a>
+<x-ds.field :label="__('Password')" name="password" :hint="isset($user) ? __('Leave blank to keep current password.') : __('Minimum 8 characters.')" :error="$errors->first('password')">
+    <input type="password" name="password" class="ds-input" {{ isset($user) ? '' : 'required' }} minlength="8">
+</x-ds.field>
+
+<x-ds.field :label="__('Role')" name="role" :required="true" :error="$errors->first('role')">
+    <select name="role" class="ds-select" required>
+        @foreach (['superadmin', 'admin', 'promoter', 'sub_promoter', 'buyer'] as $r)
+            <option value="{{ $r }}" @selected(old('role', $user->role ?? 'promoter') === $r)>{{ __(ucfirst($r)) }}</option>
+        @endforeach
+    </select>
+</x-ds.field>
+
+<fieldset class="rounded-lg border border-[color:var(--ds-border)] p-4 space-y-3">
+    <legend class="px-2 text-sm font-medium text-[color:var(--ds-text)]">{{ __('Festival assignments') }}</legend>
+    <p class="text-xs text-[color:var(--ds-text-muted)]">{{ __('Pick festivals and the role this user will have on each.') }}</p>
+    <div class="space-y-2 max-h-72 overflow-y-auto">
+        @php
+            $assigned = isset($user) ? $user->festivals()->get()->keyBy('id') : collect();
+        @endphp
+        @foreach ($festivals as $f)
+            @php
+                $existingRole = old('roles.' . $f->id, $assigned[$f->id]->pivot->role_in_festival ?? null);
+            @endphp
+            <div class="flex items-center gap-3 py-1.5">
+                <label class="inline-flex items-center gap-2 text-sm flex-1 min-w-0">
+                    <input type="checkbox" name="festivals[]" value="{{ $f->id }}" class="ds-checkbox" @checked(in_array($f->id, old('festivals', $assigned->keys()->all())))>
+                    <span class="truncate">{{ $f->displayName() }} <span class="text-xs text-[color:var(--ds-text-muted)]">· {{ $f->location }}</span></span>
+                </label>
+                <select name="roles[{{ $f->id }}]" class="ds-select" style="height: 32px; padding: 0 24px 0 8px; font-size: 12px; min-width: 130px;">
+                    <option value="">{{ __('No role') }}</option>
+                    @foreach (['admin', 'promoter', 'sub_promoter'] as $r)
+                        <option value="{{ $r }}" @selected($existingRole === $r)>{{ __(ucfirst($r)) }}</option>
+                    @endforeach
+                </select>
+            </div>
+        @endforeach
+    </div>
+</fieldset>
+
+<div class="flex items-center justify-end gap-2 pt-3 border-t border-[color:var(--ds-divider)]">
+    <x-ds.button variant="secondary" :href="route('superadmin.users.index')" wire:navigate>{{ __('Cancel') }}</x-ds.button>
+    <x-ds.button variant="primary" type="submit">{{ isset($user) ? __('Save changes') : __('Create user') }}</x-ds.button>
 </div>

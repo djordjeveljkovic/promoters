@@ -4,6 +4,12 @@ return [
     'page_title' => 'Admin Kontrolna Tabla',
     'main_heading' => 'Admin Analitička Kontrolna Tabla',
 
+    /* Stat card hints (used by the superadmin dashboard) */
+    'stat_active_festivals'        => ':count aktivno',
+    'stat_users_breakdown'         => ':admins admina · :promoters promotera',
+    'stat_orders_completed'        => ':count završeno',
+    'stat_revenue_hint'            => 'Od završenih porudžbina',
+
     'overall_performance' => [
         'heading' => 'Ukupni Performans',
         'total_revenue_all_time' => 'Ukupan Prihod (Sve vreme)',

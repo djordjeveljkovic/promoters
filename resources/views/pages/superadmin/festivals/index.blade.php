@@ -1,78 +1,102 @@
 <x-layouts.app :title="__('Festivals')">
-    <div class="p-6 space-y-6">
-        <div class="flex items-center justify-between">
-            <h1 class="text-2xl font-bold">🎪 {{ __('Festivals') }}</h1>
-            <a href="{{ route('superadmin.festivals.create') }}"
-               class="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700">
-                + {{ __('New festival') }}
-            </a>
-        </div>
 
-        <form method="GET" class="flex flex-wrap gap-3 items-end">
-            <div>
-                <label class="text-xs text-gray-500 block">{{ __('Search') }}</label>
-                <input type="text" name="search" value="{{ request('search') }}"
-                       class="px-3 py-2 border rounded-lg" placeholder="REFEST, 2026...">
-            </div>
-            <div>
-                <label class="text-xs text-gray-500 block">{{ __('Status') }}</label>
-                <select name="status" class="px-3 py-2 border rounded-lg">
-                    <option value="">{{ __('All') }}</option>
+    <x-ds.page-header
+        :title="__('Festivals')"
+        :subtitle="__('All festival editions on the platform.')"
+    >
+        <x-slot:actions>
+            <x-ds.button variant="primary" :href="route('superadmin.festivals.create')" wire:navigate>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                {{ __('New festival') }}
+            </x-ds.button>
+        </x-slot:actions>
+    </x-ds.page-header>
+
+    <x-ds.card :padded="false">
+        <x-slot:body>
+            {{-- Toolbar --}}
+            <form method="GET" class="ds-toolbar !border-b-0 !bg-transparent">
+                <div class="ds-search">
+                    <svg class="ds-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" name="search" value="{{ request('search') }}" class="ds-input" placeholder="{{ __('Search festivals...') }}">
+                </div>
+                <select name="status" class="ds-select" style="min-width: 140px;">
+                    <option value="">{{ __('All statuses') }}</option>
                     @foreach (['draft', 'active', 'archived'] as $s)
-                        <option value="{{ $s }}" @selected(request('status') === $s)>{{ __($s) }}</option>
+                        <option value="{{ $s }}" @selected(request('status') === $s)>{{ __(ucfirst($s)) }}</option>
                     @endforeach
                 </select>
-            </div>
-            <button class="px-4 py-2 bg-gray-900 text-white rounded-lg">{{ __('Filter') }}</button>
-        </form>
+                <x-ds.button variant="primary" size="sm" type="submit">{{ __('Filter') }}</x-ds.button>
+                @if (request('search') || request('status'))
+                    <x-ds.button variant="ghost" size="sm" :href="route('superadmin.festivals.index')" wire:navigate>{{ __('Clear') }}</x-ds.button>
+                @endif
+            </form>
+        </x-slot:body>
+    </x-ds.card>
 
-        <div class="overflow-x-auto bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
-            <table class="w-full">
-                <thead class="text-left text-xs uppercase text-gray-500 border-b border-gray-200 dark:border-gray-700">
-                    <tr>
-                        <th class="px-4 py-3">{{ __('Festival') }}</th>
-                        <th class="px-4 py-3">{{ __('Year') }}</th>
-                        <th class="px-4 py-3">{{ __('Status') }}</th>
-                        <th class="px-4 py-3">{{ __('Ticket types') }}</th>
-                        <th class="px-4 py-3">{{ __('Orders') }}</th>
-                        <th class="px-4 py-3">{{ __('Tickets') }}</th>
-                        <th class="px-4 py-3"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                @forelse ($festivals as $f)
-                    <tr class="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                        <td class="px-4 py-3">
-                            <div class="font-semibold">{{ $f->displayName() }}</div>
-                            <div class="text-xs text-gray-500">{{ $f->location }}</div>
-                        </td>
-                        <td class="px-4 py-3 font-mono">{{ $f->year }}</td>
-                        <td class="px-4 py-3">
-                            <span class="px-2 py-1 rounded text-xs {{ $statusColors[$f->status] ?? '' }}">{{ __($f->status) }}</span>
-                        </td>
-                        <td class="px-4 py-3">{{ $f->ticket_types_count }}</td>
-                        <td class="px-4 py-3">{{ $f->orders_count }}</td>
-                        <td class="px-4 py-3">{{ $f->tickets_count }}</td>
-                        <td class="px-4 py-3 text-right">
-                            <a href="{{ route('superadmin.festivals.assignments', $f) }}" class="text-blue-600 hover:underline text-sm">{{ __('Users') }}</a>
-                            <a href="{{ route('superadmin.festivals.edit', $f) }}" class="ml-3 text-pink-600 hover:underline text-sm">{{ __('Edit') }}</a>
-                            @if ($f->status === 'draft')
-                                <form action="{{ route('superadmin.festivals.destroy', $f) }}" method="POST" class="inline ml-3"
-                                      onsubmit="return confirm('{{ __('Delete this draft festival?') }}')">
-                                    @csrf @method('DELETE')
-                                    <button class="text-red-600 hover:underline text-sm">{{ __('Delete') }}</button>
-                                </form>
-                            @endif
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="7" class="px-4 py-12 text-center text-gray-500">{{ __('No festivals yet — click "New festival" to create one.') }}</td>
-                    </tr>
-                @endforelse
-                </tbody>
-            </table>
-            <div class="px-4 py-3">{{ $festivals->links() }}</div>
-        </div>
-    </div>
+    <x-ds.table class="mt-4">
+        <x-slot:head>
+            <tr>
+                <th>{{ __('Festival') }}</th>
+                <th>{{ __('Year') }}</th>
+                <th>{{ __('Status') }}</th>
+                <th class="text-right">{{ __('Ticket types') }}</th>
+                <th class="text-right">{{ __('Orders') }}</th>
+                <th class="text-right">{{ __('Tickets') }}</th>
+                <th class="text-right">{{ __('Actions') }}</th>
+            </tr>
+        </x-slot:head>
+        @forelse ($festivals as $f)
+            <tr>
+                <td>
+                    <div class="row-title">{{ $f->displayName() }}</div>
+                    <div class="row-meta">{{ $f->location ?: '—' }}</div>
+                </td>
+                <td class="num">{{ $f->year }}</td>
+                <td>
+                    <x-ds.badge :variant="match($f->status) { 'active' => 'success', 'draft' => 'warning', default => 'neutral' }" dot>
+                        {{ __(ucfirst($f->status)) }}
+                    </x-ds.badge>
+                </td>
+                <td class="text-right num">{{ number_format($f->ticket_types_count) }}</td>
+                <td class="text-right num">{{ number_format($f->orders_count) }}</td>
+                <td class="text-right num">{{ number_format($f->tickets_count) }}</td>
+                <td>
+                    <div class="row-actions">
+                        <x-ds.button variant="ghost" size="sm" :href="route('superadmin.festivals.assignments', $f)" wire:navigate>
+                            {{ __('Users') }}
+                        </x-ds.button>
+                        <x-ds.button variant="ghost" size="sm" :href="route('superadmin.festivals.edit', $f)" wire:navigate>
+                            {{ __('Edit') }}
+                        </x-ds.button>
+                        @if ($f->status === 'draft')
+                            <form action="{{ route('superadmin.festivals.destroy', $f) }}" method="POST" onsubmit="return confirm('{{ __('Delete this draft festival?') }}')">
+                                @csrf @method('DELETE')
+                                <x-ds.button variant="danger-ghost" size="sm" type="submit">
+                                    {{ __('Delete') }}
+                                </x-ds.button>
+                            </form>
+                        @endif
+                    </div>
+                </td>
+            </tr>
+        @empty
+            <tr>
+                <td colspan="7">
+                    <x-ds.empty-state
+                        :title="__('No festivals yet')"
+                        :message="__('Click the New festival button to create the first one.')"
+                    >
+                        <x-ds.button variant="primary" :href="route('superadmin.festivals.create')" wire:navigate>
+                            {{ __('Create festival') }}
+                        </x-ds.button>
+                    </x-ds.empty-state>
+                </td>
+            </tr>
+        @endforelse
+    </x-ds.table>
+
+    @if ($festivals->hasPages())
+        <div class="mt-4">{{ $festivals->links() }}</div>
+    @endif
 </x-layouts.app>

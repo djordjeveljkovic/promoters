@@ -22,25 +22,27 @@
 3. [Architecture](#architecture)
 4. [Tech Stack](#tech-stack)
 5. [Domain Model](#domain-model)
-6. [Roles & Permissions](#roles--permissions)
-7. [Order Lifecycle](#order-lifecycle)
-8. [Commission Engine](#commission-engine)
-8a. [Mail Templates](#mail-templates)
-9. [Real-time Updates (Reverb)](#real-time-updates-reverb)
-10. [Project Structure](#project-structure)
-11. [Installation](#installation)
-12. [Configuration](#configuration)
-13. [Database Schema](#database-schema)
-14. [Running the App](#running-the-app)
-15. [Background Workers & Queues](#background-workers--queues)
-16. [Internationalisation](#internationalisation)
-17. [API Endpoints](#api-endpoints)
-18. [Landing Page (Three.js / WebGL)](#landing-page-threejs--webgl)
-19. [Testing](#testing)
-20. [Deployment Notes](#deployment-notes)
-21. [Roadmap](#roadmap)
-22. [Known Issues](#known-issues)
-23. [License](#license)
+6. [Design System](#design-system)
+7. [Multi-Festival Architecture](#multi-festival-architecture)
+8. [Roles & Permissions](#roles--permissions)
+9. [Order Lifecycle](#order-lifecycle)
+10. [Commission Engine](#commission-engine)
+11. [Mail Templates](#mail-templates)
+12. [Real-time Updates (Reverb)](#real-time-updates-reverb)
+13. [Project Structure](#project-structure)
+14. [Installation](#installation)
+15. [Configuration](#configuration)
+16. [Database Schema](#database-schema)
+17. [Running the App](#running-the-app)
+18. [Background Workers & Queues](#background-workers--queues)
+19. [Internationalisation](#internationalisation)
+20. [API Endpoints](#api-endpoints)
+21. [Landing Page (Three.js / WebGL)](#landing-page-threejs--webgl)
+22. [Testing](#testing)
+23. [Deployment Notes](#deployment-notes)
+24. [Roadmap](#roadmap)
+25. [Known Issues](#known-issues)
+26. [License](#license)
 
 ---
 
@@ -171,6 +173,56 @@ TicketType
 - `ordered_by` is the **end customer** the ticket was sold to.
   For sales made through the promoter flow, the customer may be a fresh `User`
   record created on the fly (role `buyer`).
+
+---
+
+## Design System
+
+Every page in the dashboard is built on a single design-system layer
+(`resources/css/design-system.css` + a small set of anonymous Blade
+components under `resources/views/components/ds/`). It is intentionally
+small — a handful of tokens, a handful of primitives — so every screen
+reads as part of the same product.
+
+### Tokens (CSS custom properties)
+
+All visual properties are exposed as CSS custom properties so dark mode and
+theming are trivial to add later.
+
+| Token group         | Examples                                                  |
+| ------------------- | --------------------------------------------------------- |
+| Surfaces            | `--ds-bg`, `--ds-surface`, `--ds-bg-subtle`               |
+| Text                | `--ds-text`, `--ds-text-muted`, `--ds-text-subtle`         |
+| Borders             | `--ds-border`, `--ds-divider`, `--ds-border-strong`       |
+| Accent              | `--ds-accent` (single indigo, used sparingly)             |
+| Status (semantic)   | success / warning / danger / info variants                 |
+| Radius              | 4 / 6 / 8 / 10 / 12 / 16 px                                 |
+| Spacing             | 4 / 8 / 12 / 16 / 20 / 24 / 32 / 40 / 48 px                |
+
+### Primitives
+
+`x-ds.page-header`, `x-ds.card`, `x-ds.stat`, `x-ds.table`, `x-ds.badge`,
+`x-ds.button`, `x-ds.field`, `x-ds.alert`, `x-ds.empty-state`,
+`x-ds.avatar`, `x-ds.nav-item`, `x-ds.toolbar`.  Use the same primitives
+in every page so the look stays consistent.
+
+### Rules of thumb
+
+- **One accent color**.  Indigo for buttons, focus rings and active nav.
+  Status colors only for badges / alerts.
+- **Cards, not colored panels**.  White surface + 1 px border + small
+  shadow.  No large color fills.
+- **Tables**.  Sticky header, 14 px body text, hover row, right-aligned
+  numerics, status badge in the last column.
+- **Empty states**.  Calm icon + heading + one sentence + one CTA.  No
+  illustrations.
+- **Numbers**.  Always `num` (tabular-nums) so columns line up.
+- **Forms**.  One column up to 640 px, then two.  Labels above inputs,
+  helper text below, error text in red below the helper.
+- **No gradients**, no glassmorphism, no neon.  Festival brand colors
+  only appear as a 2 px accent strip on cards or in the festival picker.
+
+See `resources/css/design-system.css` for the source of truth.
 
 ---
 

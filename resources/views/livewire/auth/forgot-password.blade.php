@@ -1,26 +1,23 @@
- <div class="flex flex-col gap-6">
-    <x-auth-header :title="__('Forgot password')" :description="__('Enter your email to receive a password reset link')" />
+<div class="space-y-6">
+    <div>
+        <h1 class="text-2xl font-semibold text-[color:var(--ds-text)]">{{ __('Forgot password') }}</h1>
+        <p class="text-sm text-[color:var(--ds-text-muted)] mt-1">{{ __('Enter your email to receive a password reset link') }}</p>
+    </div>
 
-    <!-- Session Status -->
-    <x-auth-session-status class="text-center" :status="session('status')" />
+    <x-auth-session-status class="text-sm text-center" :status="session('status')" />
 
-    <form wire:submit="sendPasswordResetLink" class="flex flex-col gap-6">
-        <!-- Email Address -->
-        <flux:input
-            wire:model="email"
-            :label="__('Email Address')"
-            type="email"
-            required
-            autofocus
-            placeholder="email@example.com"
-            viewable
-        />
+    <form wire:submit="sendPasswordResetLink" class="space-y-4">
+        <x-ds.field :label="__('Email Address')" name="email" :required="true">
+            <input wire:model="email" type="email" required autofocus class="ds-input" placeholder="email@example.com">
+        </x-ds.field>
 
-        <flux:button variant="primary" type="submit" class="w-full">{{ __('Email password reset link') }}</flux:button>
+        <button type="submit" class="ds-btn ds-btn-primary w-full">
+            {{ __('Email password reset link') }}
+        </button>
     </form>
 
-    <div class="space-x-1 rtl:space-x-reverse text-center text-sm text-zinc-400">
+    <div class="text-center text-sm text-[color:var(--ds-text-muted)] pt-3 border-t border-[color:var(--ds-divider)]">
         {{ __('Or, return to') }}
-        <flux:link :href="route('login')" wire:navigate>{{ __('log in') }}</flux:link>
+        <a href="{{ route('login') }}" wire:navigate class="text-indigo-600 hover:underline font-medium">{{ __('log in') }}</a>
     </div>
 </div>

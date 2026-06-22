@@ -1,9 +1,16 @@
-<x-layouts.app :title="__('New user')">
-    <div class="p-6 max-w-5xl">
-        <h1 class="text-2xl font-bold mb-6">+ {{ __('New user') }}</h1>
-        <form action="{{ route('superadmin.users.store') }}" method="POST"
-              class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+<x-layouts.app :title="__('Create user')">
+    <x-ds.page-header
+        :title="__('Create user')"
+        :subtitle="__('Add a new user to the platform.')"
+    >
+        <x-slot:actions>
+            <x-ds.button variant="ghost" :href="route('superadmin.users.index')" wire:navigate>← {{ __('Back to list') }}</x-ds.button>
+        </x-slot:actions>
+    </x-ds.page-header>
+
+    <x-ds.card class="max-w-2xl">
+        <form method="POST" action="{{ route('superadmin.users.store') }}" class="space-y-5">
             @include('pages.superadmin.users._form')
         </form>
-    </div>
+    </x-ds.card>
 </x-layouts.app>
