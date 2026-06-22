@@ -19,6 +19,9 @@
         <form method="POST" action="{{ route('admin.ticket-types.update', ['festival' => $festival->slug, 'id' => $ticketType->id]) }}" enctype="multipart/form-data" class="space-y-5" id="editTicketTypeForm">
             @csrf
             @method('PUT')
+            @if ($festival)
+                <input type="hidden" name="festival_id" value="{{ $festival->id }}">
+            @endif
 
             <x-ds.field :label="__('ticket_types.edit_form.name_label')" name="name" :required="true" :error="$errors->first('name')">
                 <input type="text" name="name" id="name" value="{{ old('name', $ticketType->name) }}" class="ds-input" placeholder="{{ __('ticket_types.edit_form.name_placeholder') }}" required>

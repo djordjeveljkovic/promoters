@@ -16100,3 +16100,255 @@ Stack trace:
 [2026-06-22 15:36:28] testing.INFO: User password updated. User ID: 1, Email: treva20@example.net  
 [2026-06-22 15:36:28] testing.INFO: updatePassword method started for user: 1  
 [2026-06-22 15:36:28] testing.WARNING: Validation failed for user: 1. Errors: {"current_password":["Lozinka je neta\u010dna."]}  
+[2026-06-22 15:57:24] local.ERROR: Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'R-2026' for key 'festivals_name_year_unique' in /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php:53
+Stack trace:
+#0 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(53): PDOStatement->execute()
+#1 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php(827): Illuminate\Database\MySqlConnection->{closure:Illuminate\Database\MySqlConnection::insert():42}()
+#2 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php(794): Illuminate\Database\Connection->runQueryCallback()
+#3 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(42): Illuminate\Database\Connection->run()
+#4 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/MySqlProcessor.php(35): Illuminate\Database\MySqlConnection->insert()
+#5 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(4170): Illuminate\Database\Query\Processors\MySqlProcessor->processInsertGetId()
+#6 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(2237): Illuminate\Database\Query\Builder->insertGetId()
+#7 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1436): Illuminate\Database\Eloquent\Builder->__call()
+#8 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1401): Illuminate\Database\Eloquent\Model->insertAndSetId()
+#9 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1240): Illuminate\Database\Eloquent\Model->performInsert()
+#10 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1219): Illuminate\Database\Eloquent\Model->save()
+#11 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Support/helpers.php(393): Illuminate\Database\Eloquent\Builder->{closure:Illuminate\Database\Eloquent\Builder::create():1218}()
+#12 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1218): tap()
+#13 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php(23): Illuminate\Database\Eloquent\Builder->create()
+#14 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2544): Illuminate\Database\Eloquent\Model->forwardCallTo()
+#15 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2560): Illuminate\Database\Eloquent\Model->__call()
+#16 Command line code(7): Illuminate\Database\Eloquent\Model::__callStatic()
+#17 {main}
+
+Next Illuminate\Database\UniqueConstraintViolationException: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'R-2026' for key 'festivals_name_year_unique' (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: promoteri, SQL: insert into `festivals` (`name`, `year`, `slug`, `status`, `updated_at`, `created_at`) values (R, 2026, r-2026, active, 2026-06-22 15:57:24, 2026-06-22 15:57:24)) in /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php:838
+Stack trace:
+#0 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php(794): Illuminate\Database\Connection->runQueryCallback()
+#1 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(42): Illuminate\Database\Connection->run()
+#2 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/MySqlProcessor.php(35): Illuminate\Database\MySqlConnection->insert()
+#3 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(4170): Illuminate\Database\Query\Processors\MySqlProcessor->processInsertGetId()
+#4 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(2237): Illuminate\Database\Query\Builder->insertGetId()
+#5 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1436): Illuminate\Database\Eloquent\Builder->__call()
+#6 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1401): Illuminate\Database\Eloquent\Model->insertAndSetId()
+#7 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1240): Illuminate\Database\Eloquent\Model->performInsert()
+#8 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1219): Illuminate\Database\Eloquent\Model->save()
+#9 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Support/helpers.php(393): Illuminate\Database\Eloquent\Builder->{closure:Illuminate\Database\Eloquent\Builder::create():1218}()
+#10 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1218): tap()
+#11 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php(23): Illuminate\Database\Eloquent\Builder->create()
+#12 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2544): Illuminate\Database\Eloquent\Model->forwardCallTo()
+#13 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2560): Illuminate\Database\Eloquent\Model->__call()
+#14 Command line code(7): Illuminate\Database\Eloquent\Model::__callStatic()
+#15 {main}
+  thrown {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'R-2026' for key 'festivals_name_year_unique' in /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php:53
+Stack trace:
+#0 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(53): PDOStatement->execute()
+#1 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php(827): Illuminate\\Database\\MySqlConnection->{closure:Illuminate\\Database\\MySqlConnection::insert():42}()
+#2 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php(794): Illuminate\\Database\\Connection->runQueryCallback()
+#3 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(42): Illuminate\\Database\\Connection->run()
+#4 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/MySqlProcessor.php(35): Illuminate\\Database\\MySqlConnection->insert()
+#5 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(4170): Illuminate\\Database\\Query\\Processors\\MySqlProcessor->processInsertGetId()
+#6 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(2237): Illuminate\\Database\\Query\\Builder->insertGetId()
+#7 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1436): Illuminate\\Database\\Eloquent\\Builder->__call()
+#8 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1401): Illuminate\\Database\\Eloquent\\Model->insertAndSetId()
+#9 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1240): Illuminate\\Database\\Eloquent\\Model->performInsert()
+#10 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1219): Illuminate\\Database\\Eloquent\\Model->save()
+#11 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Support/helpers.php(393): Illuminate\\Database\\Eloquent\\Builder->{closure:Illuminate\\Database\\Eloquent\\Builder::create():1218}()
+#12 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1218): tap()
+#13 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php(23): Illuminate\\Database\\Eloquent\\Builder->create()
+#14 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2544): Illuminate\\Database\\Eloquent\\Model->forwardCallTo()
+#15 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2560): Illuminate\\Database\\Eloquent\\Model->__call()
+#16 Command line code(7): Illuminate\\Database\\Eloquent\\Model::__callStatic()
+#17 {main}
+
+Next Illuminate\\Database\\UniqueConstraintViolationException: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'R-2026' for key 'festivals_name_year_unique' (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: promoteri, SQL: insert into `festivals` (`name`, `year`, `slug`, `status`, `updated_at`, `created_at`) values (R, 2026, r-2026, active, 2026-06-22 15:57:24, 2026-06-22 15:57:24)) in /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php:838
+Stack trace:
+#0 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php(794): Illuminate\\Database\\Connection->runQueryCallback()
+#1 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(42): Illuminate\\Database\\Connection->run()
+#2 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/MySqlProcessor.php(35): Illuminate\\Database\\MySqlConnection->insert()
+#3 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(4170): Illuminate\\Database\\Query\\Processors\\MySqlProcessor->processInsertGetId()
+#4 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(2237): Illuminate\\Database\\Query\\Builder->insertGetId()
+#5 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1436): Illuminate\\Database\\Eloquent\\Builder->__call()
+#6 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1401): Illuminate\\Database\\Eloquent\\Model->insertAndSetId()
+#7 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1240): Illuminate\\Database\\Eloquent\\Model->performInsert()
+#8 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1219): Illuminate\\Database\\Eloquent\\Model->save()
+#9 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Support/helpers.php(393): Illuminate\\Database\\Eloquent\\Builder->{closure:Illuminate\\Database\\Eloquent\\Builder::create():1218}()
+#10 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1218): tap()
+#11 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php(23): Illuminate\\Database\\Eloquent\\Builder->create()
+#12 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2544): Illuminate\\Database\\Eloquent\\Model->forwardCallTo()
+#13 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2560): Illuminate\\Database\\Eloquent\\Model->__call()
+#14 Command line code(7): Illuminate\\Database\\Eloquent\\Model::__callStatic()
+#15 {main}
+  thrown at /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php:838)
+[stacktrace]
+#0 {main}
+"} 
+[2026-06-22 15:57:32] local.ERROR: Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'R-2026' for key 'festivals_name_year_unique' in /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php:53
+Stack trace:
+#0 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(53): PDOStatement->execute()
+#1 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php(827): Illuminate\Database\MySqlConnection->{closure:Illuminate\Database\MySqlConnection::insert():42}()
+#2 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php(794): Illuminate\Database\Connection->runQueryCallback()
+#3 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(42): Illuminate\Database\Connection->run()
+#4 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/MySqlProcessor.php(35): Illuminate\Database\MySqlConnection->insert()
+#5 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(4170): Illuminate\Database\Query\Processors\MySqlProcessor->processInsertGetId()
+#6 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(2237): Illuminate\Database\Query\Builder->insertGetId()
+#7 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1436): Illuminate\Database\Eloquent\Builder->__call()
+#8 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1401): Illuminate\Database\Eloquent\Model->insertAndSetId()
+#9 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1240): Illuminate\Database\Eloquent\Model->performInsert()
+#10 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1219): Illuminate\Database\Eloquent\Model->save()
+#11 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Support/helpers.php(393): Illuminate\Database\Eloquent\Builder->{closure:Illuminate\Database\Eloquent\Builder::create():1218}()
+#12 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1218): tap()
+#13 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php(23): Illuminate\Database\Eloquent\Builder->create()
+#14 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2544): Illuminate\Database\Eloquent\Model->forwardCallTo()
+#15 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2560): Illuminate\Database\Eloquent\Model->__call()
+#16 Command line code(7): Illuminate\Database\Eloquent\Model::__callStatic()
+#17 {main}
+
+Next Illuminate\Database\UniqueConstraintViolationException: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'R-2026' for key 'festivals_name_year_unique' (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: promoteri, SQL: insert into `festivals` (`name`, `year`, `slug`, `status`, `updated_at`, `created_at`) values (R, 2026, r-2026, active, 2026-06-22 15:57:32, 2026-06-22 15:57:32)) in /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php:838
+Stack trace:
+#0 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php(794): Illuminate\Database\Connection->runQueryCallback()
+#1 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(42): Illuminate\Database\Connection->run()
+#2 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/MySqlProcessor.php(35): Illuminate\Database\MySqlConnection->insert()
+#3 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(4170): Illuminate\Database\Query\Processors\MySqlProcessor->processInsertGetId()
+#4 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(2237): Illuminate\Database\Query\Builder->insertGetId()
+#5 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1436): Illuminate\Database\Eloquent\Builder->__call()
+#6 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1401): Illuminate\Database\Eloquent\Model->insertAndSetId()
+#7 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1240): Illuminate\Database\Eloquent\Model->performInsert()
+#8 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1219): Illuminate\Database\Eloquent\Model->save()
+#9 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Support/helpers.php(393): Illuminate\Database\Eloquent\Builder->{closure:Illuminate\Database\Eloquent\Builder::create():1218}()
+#10 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1218): tap()
+#11 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php(23): Illuminate\Database\Eloquent\Builder->create()
+#12 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2544): Illuminate\Database\Eloquent\Model->forwardCallTo()
+#13 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2560): Illuminate\Database\Eloquent\Model->__call()
+#14 Command line code(7): Illuminate\Database\Eloquent\Model::__callStatic()
+#15 {main}
+  thrown {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'R-2026' for key 'festivals_name_year_unique' in /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php:53
+Stack trace:
+#0 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(53): PDOStatement->execute()
+#1 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php(827): Illuminate\\Database\\MySqlConnection->{closure:Illuminate\\Database\\MySqlConnection::insert():42}()
+#2 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php(794): Illuminate\\Database\\Connection->runQueryCallback()
+#3 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(42): Illuminate\\Database\\Connection->run()
+#4 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/MySqlProcessor.php(35): Illuminate\\Database\\MySqlConnection->insert()
+#5 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(4170): Illuminate\\Database\\Query\\Processors\\MySqlProcessor->processInsertGetId()
+#6 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(2237): Illuminate\\Database\\Query\\Builder->insertGetId()
+#7 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1436): Illuminate\\Database\\Eloquent\\Builder->__call()
+#8 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1401): Illuminate\\Database\\Eloquent\\Model->insertAndSetId()
+#9 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1240): Illuminate\\Database\\Eloquent\\Model->performInsert()
+#10 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1219): Illuminate\\Database\\Eloquent\\Model->save()
+#11 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Support/helpers.php(393): Illuminate\\Database\\Eloquent\\Builder->{closure:Illuminate\\Database\\Eloquent\\Builder::create():1218}()
+#12 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1218): tap()
+#13 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php(23): Illuminate\\Database\\Eloquent\\Builder->create()
+#14 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2544): Illuminate\\Database\\Eloquent\\Model->forwardCallTo()
+#15 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2560): Illuminate\\Database\\Eloquent\\Model->__call()
+#16 Command line code(7): Illuminate\\Database\\Eloquent\\Model::__callStatic()
+#17 {main}
+
+Next Illuminate\\Database\\UniqueConstraintViolationException: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'R-2026' for key 'festivals_name_year_unique' (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: promoteri, SQL: insert into `festivals` (`name`, `year`, `slug`, `status`, `updated_at`, `created_at`) values (R, 2026, r-2026, active, 2026-06-22 15:57:32, 2026-06-22 15:57:32)) in /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php:838
+Stack trace:
+#0 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php(794): Illuminate\\Database\\Connection->runQueryCallback()
+#1 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(42): Illuminate\\Database\\Connection->run()
+#2 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/MySqlProcessor.php(35): Illuminate\\Database\\MySqlConnection->insert()
+#3 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(4170): Illuminate\\Database\\Query\\Processors\\MySqlProcessor->processInsertGetId()
+#4 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(2237): Illuminate\\Database\\Query\\Builder->insertGetId()
+#5 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1436): Illuminate\\Database\\Eloquent\\Builder->__call()
+#6 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1401): Illuminate\\Database\\Eloquent\\Model->insertAndSetId()
+#7 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1240): Illuminate\\Database\\Eloquent\\Model->performInsert()
+#8 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1219): Illuminate\\Database\\Eloquent\\Model->save()
+#9 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Support/helpers.php(393): Illuminate\\Database\\Eloquent\\Builder->{closure:Illuminate\\Database\\Eloquent\\Builder::create():1218}()
+#10 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1218): tap()
+#11 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php(23): Illuminate\\Database\\Eloquent\\Builder->create()
+#12 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2544): Illuminate\\Database\\Eloquent\\Model->forwardCallTo()
+#13 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2560): Illuminate\\Database\\Eloquent\\Model->__call()
+#14 Command line code(7): Illuminate\\Database\\Eloquent\\Model::__callStatic()
+#15 {main}
+  thrown at /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php:838)
+[stacktrace]
+#0 {main}
+"} 
+[2026-06-22 15:57:38] local.ERROR: Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'R-2026' for key 'festivals_name_year_unique' in /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php:53
+Stack trace:
+#0 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(53): PDOStatement->execute()
+#1 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php(827): Illuminate\Database\MySqlConnection->{closure:Illuminate\Database\MySqlConnection::insert():42}()
+#2 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php(794): Illuminate\Database\Connection->runQueryCallback()
+#3 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(42): Illuminate\Database\Connection->run()
+#4 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/MySqlProcessor.php(35): Illuminate\Database\MySqlConnection->insert()
+#5 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(4170): Illuminate\Database\Query\Processors\MySqlProcessor->processInsertGetId()
+#6 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(2237): Illuminate\Database\Query\Builder->insertGetId()
+#7 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1436): Illuminate\Database\Eloquent\Builder->__call()
+#8 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1401): Illuminate\Database\Eloquent\Model->insertAndSetId()
+#9 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1240): Illuminate\Database\Eloquent\Model->performInsert()
+#10 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1219): Illuminate\Database\Eloquent\Model->save()
+#11 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Support/helpers.php(393): Illuminate\Database\Eloquent\Builder->{closure:Illuminate\Database\Eloquent\Builder::create():1218}()
+#12 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1218): tap()
+#13 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php(23): Illuminate\Database\Eloquent\Builder->create()
+#14 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2544): Illuminate\Database\Eloquent\Model->forwardCallTo()
+#15 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2560): Illuminate\Database\Eloquent\Model->__call()
+#16 Command line code(7): Illuminate\Database\Eloquent\Model::__callStatic()
+#17 {main}
+
+Next Illuminate\Database\UniqueConstraintViolationException: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'R-2026' for key 'festivals_name_year_unique' (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: promoteri, SQL: insert into `festivals` (`name`, `year`, `slug`, `status`, `updated_at`, `created_at`) values (R, 2026, r-2026, active, 2026-06-22 15:57:38, 2026-06-22 15:57:38)) in /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php:838
+Stack trace:
+#0 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php(794): Illuminate\Database\Connection->runQueryCallback()
+#1 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(42): Illuminate\Database\Connection->run()
+#2 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/MySqlProcessor.php(35): Illuminate\Database\MySqlConnection->insert()
+#3 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(4170): Illuminate\Database\Query\Processors\MySqlProcessor->processInsertGetId()
+#4 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(2237): Illuminate\Database\Query\Builder->insertGetId()
+#5 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1436): Illuminate\Database\Eloquent\Builder->__call()
+#6 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1401): Illuminate\Database\Eloquent\Model->insertAndSetId()
+#7 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1240): Illuminate\Database\Eloquent\Model->performInsert()
+#8 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1219): Illuminate\Database\Eloquent\Model->save()
+#9 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Support/helpers.php(393): Illuminate\Database\Eloquent\Builder->{closure:Illuminate\Database\Eloquent\Builder::create():1218}()
+#10 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1218): tap()
+#11 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php(23): Illuminate\Database\Eloquent\Builder->create()
+#12 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2544): Illuminate\Database\Eloquent\Model->forwardCallTo()
+#13 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2560): Illuminate\Database\Eloquent\Model->__call()
+#14 Command line code(7): Illuminate\Database\Eloquent\Model::__callStatic()
+#15 {main}
+  thrown {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'R-2026' for key 'festivals_name_year_unique' in /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php:53
+Stack trace:
+#0 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(53): PDOStatement->execute()
+#1 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php(827): Illuminate\\Database\\MySqlConnection->{closure:Illuminate\\Database\\MySqlConnection::insert():42}()
+#2 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php(794): Illuminate\\Database\\Connection->runQueryCallback()
+#3 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(42): Illuminate\\Database\\Connection->run()
+#4 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/MySqlProcessor.php(35): Illuminate\\Database\\MySqlConnection->insert()
+#5 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(4170): Illuminate\\Database\\Query\\Processors\\MySqlProcessor->processInsertGetId()
+#6 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(2237): Illuminate\\Database\\Query\\Builder->insertGetId()
+#7 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1436): Illuminate\\Database\\Eloquent\\Builder->__call()
+#8 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1401): Illuminate\\Database\\Eloquent\\Model->insertAndSetId()
+#9 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1240): Illuminate\\Database\\Eloquent\\Model->performInsert()
+#10 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1219): Illuminate\\Database\\Eloquent\\Model->save()
+#11 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Support/helpers.php(393): Illuminate\\Database\\Eloquent\\Builder->{closure:Illuminate\\Database\\Eloquent\\Builder::create():1218}()
+#12 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1218): tap()
+#13 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php(23): Illuminate\\Database\\Eloquent\\Builder->create()
+#14 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2544): Illuminate\\Database\\Eloquent\\Model->forwardCallTo()
+#15 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2560): Illuminate\\Database\\Eloquent\\Model->__call()
+#16 Command line code(7): Illuminate\\Database\\Eloquent\\Model::__callStatic()
+#17 {main}
+
+Next Illuminate\\Database\\UniqueConstraintViolationException: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'R-2026' for key 'festivals_name_year_unique' (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: promoteri, SQL: insert into `festivals` (`name`, `year`, `slug`, `status`, `updated_at`, `created_at`) values (R, 2026, r-2026, active, 2026-06-22 15:57:38, 2026-06-22 15:57:38)) in /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php:838
+Stack trace:
+#0 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php(794): Illuminate\\Database\\Connection->runQueryCallback()
+#1 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(42): Illuminate\\Database\\Connection->run()
+#2 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/MySqlProcessor.php(35): Illuminate\\Database\\MySqlConnection->insert()
+#3 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(4170): Illuminate\\Database\\Query\\Processors\\MySqlProcessor->processInsertGetId()
+#4 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(2237): Illuminate\\Database\\Query\\Builder->insertGetId()
+#5 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1436): Illuminate\\Database\\Eloquent\\Builder->__call()
+#6 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1401): Illuminate\\Database\\Eloquent\\Model->insertAndSetId()
+#7 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1240): Illuminate\\Database\\Eloquent\\Model->performInsert()
+#8 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1219): Illuminate\\Database\\Eloquent\\Model->save()
+#9 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Support/helpers.php(393): Illuminate\\Database\\Eloquent\\Builder->{closure:Illuminate\\Database\\Eloquent\\Builder::create():1218}()
+#10 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1218): tap()
+#11 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php(23): Illuminate\\Database\\Eloquent\\Builder->create()
+#12 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2544): Illuminate\\Database\\Eloquent\\Model->forwardCallTo()
+#13 /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2560): Illuminate\\Database\\Eloquent\\Model->__call()
+#14 Command line code(7): Illuminate\\Database\\Eloquent\\Model::__callStatic()
+#15 {main}
+  thrown at /home/usrtmp/Projects/repo/promoteri/vendor/laravel/framework/src/Illuminate/Database/Connection.php:838)
+[stacktrace]
+#0 {main}
+"} 
+[2026-06-22 15:58:48] testing.INFO: updatePassword method started for user: 1  
+[2026-06-22 15:58:48] testing.INFO: Validation passed for user: 1  
+[2026-06-22 15:58:48] testing.INFO: Session after flash in updatePassword:  {"success":"Lozinka je uspešno ažurirana!","_flash":{"new":["success"],"old":[]}} 
+[2026-06-22 15:58:48] testing.INFO: User password updated. User ID: 1, Email: camille.hackett@example.net  
+[2026-06-22 15:58:48] testing.INFO: updatePassword method started for user: 1  
+[2026-06-22 15:58:48] testing.WARNING: Validation failed for user: 1. Errors: {"current_password":["Lozinka je neta\u010dna."]}  

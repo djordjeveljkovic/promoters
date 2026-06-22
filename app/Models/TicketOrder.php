@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 class TicketOrder extends Model
 {
     protected $fillable = [
+        'festival_id',
         'email',
         'order_number',
         'ordered_by',

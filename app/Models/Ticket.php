@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Ticket extends Model
 {
     protected $fillable = [
+        'festival_id',
         'code',
         'ticket_type_id',
         'ticket_order_id',

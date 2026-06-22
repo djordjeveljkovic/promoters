@@ -18,6 +18,13 @@
     <x-ds.card class="max-w-2xl">
         <form method="POST" action="{{ route('admin.ticket-types.store', $festival) }}" enctype="multipart/form-data" class="space-y-5" id="createTicketTypeForm">
             @csrf
+            {{-- Safety net: the controller also resolves the festival from
+                 the request attributes (set by EnsureFestivalAccess), but
+                 we send the id along in case a future change breaks that
+                 chain — the controller prefers the explicit value. --}}
+            @if ($festival)
+                <input type="hidden" name="festival_id" value="{{ $festival->id }}">
+            @endif
 
             <x-ds.field :label="__('ticket_types.create_form.name_label')" name="name" :required="true" :error="$errors->first('name')">
                 <input type="text" name="name" id="name" value="{{ old('name') }}" class="ds-input" placeholder="{{ __('ticket_types.create_form.name_placeholder') }}" required>

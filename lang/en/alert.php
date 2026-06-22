@@ -67,4 +67,5 @@ return [
     /* ---- Authorization ---- */
     'no_festival_access'     => 'You do not have access to this festival.',
     'role_unauthorized'      => 'You are not authorized to perform this action.',
+    'no_festival_in_scope'   => 'This action requires a festival to be selected. Please navigate via a festival page.',
 ];

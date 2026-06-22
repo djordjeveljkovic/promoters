@@ -68,4 +68,5 @@ return [
     /* ---- Autorizacija ---- */
     'no_festival_access'     => 'Nemate pristup ovom festivalu.',
     'role_unauthorized'      => 'Niste ovlašćeni za ovu akciju.',
+    'no_festival_in_scope'   => 'Ova akcija zahteva da bude izabran festival. Molimo pristupite preko stranice festivala.',
 ];

@@ -102,8 +102,17 @@ class TicketController extends Controller // Assuming this is the class name
                 $photoPath = 'img/ticket_photos/' . $filename;
             }
             // 3. Create Ticket Type
+            $festival = $request->attributes->get('festival');
+            if (!$festival) {
+                // Should never happen because the EnsureFestivalAccess
+                // middleware aborts with 404 when the festival in the
+                // URL doesn't resolve, but we guard against it so the
+                // user sees a clear error instead of a confusing DB
+                // constraint violation.
+                throw new \Exception(__('alert.no_festival_in_scope'));
+            }
             $ticketType = TicketType::create([
-                'festival_id' => $request->attributes->get('festival')?->id,
+                'festival_id' => $festival->id,
                 'name' => $validatedData['name'],
                 'price' => $validatedData['price'],
                 'photo_path' => $photoPath,
