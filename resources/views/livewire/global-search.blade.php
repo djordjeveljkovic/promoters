@@ -1,4 +1,12 @@
-<div x-data="{ open: @entangle('open') }" @click.outside="open = false && $wire.close()" @keydown.escape.window="open = false && $wire.close()" class="relative">
+{{-- The `&&` from the previous version was short-circuiting: assigning
+     `open = false` yields `false`, and `false && anything` never calls
+     `$wire.close()`. The Livewire property stayed `true`, so on the
+     next render @entangle snapped the panel right back open.  Use a
+     sequence (semicolon) so both effects run every time. --}}
+<div x-data="{ open: @entangle('open') }"
+     @click.outside="open = false; $wire.close()"
+     @keydown.escape.window="open = false; $wire.close()"
+     class="relative">
     {{-- Search trigger — opens the panel on click and focuses the input --}}
     <button
         type="button"

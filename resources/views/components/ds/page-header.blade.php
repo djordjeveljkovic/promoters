@@ -27,9 +27,9 @@
         @endif
     </div>
 
-    @if (trim((string) $slot) !== '')
+    @if (trim((string) ($actions ?? '')) !== '')
         <div class="ds-page-actions">
-            {{ $slot }}
+            {{ $actions ?? '' }}
         </div>
     @endif
 </div>
