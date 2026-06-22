@@ -18,4 +18,12 @@ return [
         'logout' => 'Log Out',
         'settingssubmenu' => 'Manage your profile and account settings',
     ],
+
+    'theme' => [
+        'label' => 'Theme',
+        'light' => 'Light',
+        'dark'  => 'Dark',
+        'system' => 'System',
+        'toggle_aria' => 'Toggle theme',
+    ],
 ];

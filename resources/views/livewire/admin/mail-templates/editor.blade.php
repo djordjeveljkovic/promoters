@@ -1,5 +1,7 @@
-<x-layouts.app :title="__('mail_templates.page_title')">
-
+{{-- This view is rendered inside the default app layout (the route
+     declares `MailTemplateEditor::class` as a full-page Livewire
+     component). Do NOT wrap with <x-layouts.app> here. --}}
+<div>
     <x-ds.page-header
         :title="__('mail_templates.page_title')"
         :subtitle="__('mail_templates.page_intro')"
@@ -238,4 +240,4 @@
             </div>
         </form>
     @endif
-</x-layouts.app>
+</div>

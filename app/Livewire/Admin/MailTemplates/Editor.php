@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Computed;
-use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
@@ -31,8 +30,12 @@ use Livewire\Component;
  *    actions target that festival's override.
  *  - Otherwise we're in superadmin mode and the editor can create global
  *    defaults (festival_id = null) or festival overrides.
+ *
+ *  Note: no `#[Layout]` attribute here — both routes that mount this
+ *  component (superadmin and festival-scoped admin) already wrap it
+ *  in `<x-layouts.app>`, so adding it here would render the sidebar
+ *  twice.
  */
-#[Layout('components.layouts.app')]
 class Editor extends Component
 {
     /* --------------- URL state --------------- */

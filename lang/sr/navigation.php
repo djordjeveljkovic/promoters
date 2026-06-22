@@ -17,4 +17,12 @@ return [
         'logout' => 'Odjavi se',
         'settingssubmenu' => 'Upravljaj profilom i podesi podešavanja naloga',
     ],
+
+    'theme' => [
+        'label' => 'Tema',
+        'light' => 'Svetla',
+        'dark'  => 'Tamna',
+        'system' => 'Sistemska',
+        'toggle_aria' => 'Promeni temu',
+    ],
 ];

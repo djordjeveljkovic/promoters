@@ -1,7 +1,30 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     @include('partials.head')
+    {{-- Inline, synchronous — runs before <body> so there is no
+         flash of unstyled / wrong-theme content. Mirrors what
+         @fluxAppearance does but also writes a CSS variable the
+         body can use immediately. --}}
+    <script>
+        (function () {
+            try {
+                var stored = localStorage.getItem('flux.appearance') || 'system';
+                var apply = function (mode) {
+                    var dark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                    document.documentElement.classList.toggle('dark', dark);
+                    document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+                };
+                apply(stored);
+                window.Flux = window.Flux || {};
+                window.Flux.applyAppearance = function (mode) {
+                    if (mode === 'system') localStorage.removeItem('flux.appearance');
+                    else localStorage.setItem('flux.appearance', mode);
+                    apply(mode);
+                };
+            } catch (_) {}
+        })();
+    </script>
 </head>
 <body class="ds-app">
 
@@ -103,8 +126,14 @@
 
         {{-- User menu --}}
         @auth
-            <div class="border-t border-[color:var(--ds-divider)] p-3">
-                <details class="group" x-data>
+            <div class="border-t border-[color:var(--ds-divider)] p-3 space-y-2">
+                {{-- Theme toggle (light / system / dark) --}}
+                <div class="flex items-center justify-between px-1">
+                    <span class="text-[10px] uppercase tracking-wider text-[color:var(--ds-text-muted)] font-semibold">{{ __('Theme') }}</span>
+                    <x-ds.theme-toggle size="sm" />
+                </div>
+
+                <details class="group">
                     <summary class="list-none cursor-pointer flex items-center gap-3 px-2 py-2 rounded-md hover:bg-[color:var(--ds-bg-subtle)]">
                         <x-ds.avatar :name="$u->name" />
                         <div class="flex-1 min-w-0">

@@ -13879,3 +13879,15 @@ Stack trace:
 [2026-06-20 16:59:21] testing.INFO: User password updated. User ID: 1, Email: clovis.sporer@example.net  
 [2026-06-20 16:59:21] testing.INFO: updatePassword method started for user: 1  
 [2026-06-20 16:59:21] testing.WARNING: Validation failed for user: 1. Errors: {"current_password":["Lozinka je neta\u010dna."]}  
+[2026-06-22 14:17:23] testing.INFO: updatePassword method started for user: 1  
+[2026-06-22 14:17:23] testing.INFO: Validation passed for user: 1  
+[2026-06-22 14:17:23] testing.INFO: Session after flash in updatePassword:  {"success":"Lozinka je uspešno ažurirana!","_flash":{"new":["success"],"old":[]}} 
+[2026-06-22 14:17:23] testing.INFO: User password updated. User ID: 1, Email: voreilly@example.com  
+[2026-06-22 14:17:24] testing.INFO: updatePassword method started for user: 1  
+[2026-06-22 14:17:24] testing.WARNING: Validation failed for user: 1. Errors: {"current_password":["Lozinka je neta\u010dna."]}  
+[2026-06-22 14:18:18] testing.INFO: updatePassword method started for user: 1  
+[2026-06-22 14:18:18] testing.INFO: Validation passed for user: 1  
+[2026-06-22 14:18:18] testing.INFO: Session after flash in updatePassword:  {"success":"Lozinka je uspešno ažurirana!","_flash":{"new":["success"],"old":[]}} 
+[2026-06-22 14:18:18] testing.INFO: User password updated. User ID: 1, Email: guillermo.ruecker@example.org  
+[2026-06-22 14:18:18] testing.INFO: updatePassword method started for user: 1  
+[2026-06-22 14:18:18] testing.WARNING: Validation failed for user: 1. Errors: {"current_password":["Lozinka je neta\u010dna."]}  
