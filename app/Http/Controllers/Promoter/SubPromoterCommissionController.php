@@ -246,22 +246,31 @@ class SubPromoterCommissionController extends Controller
     }
 
     /**
-     * Make sure the calling user is the parent manager of the sub-promoter
+     * Make sure the calling user is allowed to manage this sub-promoter
      * on the given festival.
      *
      * The two checks are deliberately separated with distinct messages
      * so the user (or an admin debugging "why am I getting a 403?")
      * can tell what went wrong:
      *
-     *   - "must be a promoter manager on this festival" — happens when
-     *     a plain promoter tries to access the endpoint, or when a
-     *     manager tries the URL on a festival they aren't promoted on.
-     *   - "must be the parent of this sub-promoter" — happens when a
-     *     manager A tries to edit a sub-promoter that belongs to
-     *     manager B (which is correct: you can only manage your own).
+     *   1. "must be a promoter manager on this festival" — happens
+     *      when a plain promoter tries to access the endpoint, or
+     *      when a manager tries the URL on a festival they aren't
+     *      promoted on.  Superadmins and festival admins always
+     *      pass this check (admins can rescue sub-promoters whose
+     *      parent_id has somehow drifted).
+     *   2. "must be the parent of this sub-promoter" — happens when
+     *      a manager A tries to edit a sub-promoter that belongs to
+     *      manager B (which is correct: you can only manage your own).
+     *      Superadmins and festival admins skip this check too.
      */
     private function authorize(User $manager, Festival $festival, User $subPromoter): void
     {
+        // Admins and superadmins can always manage sub-promoters.
+        if ($manager->isSuperAdmin() || $manager->isFestivalAdmin($festival->id)) {
+            return;
+        }
+
         if (!$manager->isPromoterManager($festival->id)) {
             abort(403, __('alert.sub_promoter_manager_required', [
                 'festival' => $festival->displayName(),

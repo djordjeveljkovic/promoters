@@ -155,4 +155,45 @@ class SubPromoterCommissionFlowTest extends TestCase
         $this->get("/promoter/festivals/{$this->festivalB->slug}/sub-promoters")->assertForbidden();
         $this->get("/promoter/festivals/{$this->festivalB->slug}/sub-promoters/{$sb->id}")->assertForbidden();
     }
+
+    public function test_festival_admin_can_manage_any_subpromoter(): void
+    {
+        // Admin should be able to rescue a sub-promoter whose parent_id
+        // drifted (e.g. because the original manager was removed from
+        // the festival but the sub-promoter still exists).
+        $manager = $this->makeManager('mgr-rescue@t.local', $this->festivalA);
+        $sub = $this->makeSub($manager, 'sub-orphan@t.local', $this->festivalA);
+        // Simulate the orphan state: clear the parent_id.
+        $sub->update(['parent_id' => null]);
+
+        $admin = User::create([
+            'name' => 'Admin', 'email' => 'admin-rescue@t.local',
+            'password' => bcrypt('x'), 'role' => 'admin',
+        ]);
+        $admin->festivals()->attach($this->festivalA->id, [
+            'role_in_festival' => 'admin',
+            'assigned_by' => null, 'assigned_at' => now(),
+        ]);
+        $this->actingAs($admin);
+
+        $this->get("/promoter/festivals/{$this->festivalA->slug}/sub-promoters/{$sub->id}")->assertOk();
+        $this->put("/promoter/festivals/{$this->festivalA->slug}/sub-promoters/{$sub->id}", [
+            'commissions' => [],
+        ])->assertRedirect();
+    }
+
+    public function test_superadmin_can_manage_any_subpromoter(): void
+    {
+        $manager = $this->makeManager('mgr-su@t.local', $this->festivalA);
+        $sub = $this->makeSub($manager, 'sub-su@t.local', $this->festivalA);
+        $sub->update(['parent_id' => null]);
+
+        $su = User::create([
+            'name' => 'Root', 'email' => 'root@t.local',
+            'password' => bcrypt('x'), 'role' => 'superadmin',
+        ]);
+        $this->actingAs($su);
+
+        $this->get("/promoter/festivals/{$this->festivalA->slug}/sub-promoters/{$sub->id}")->assertOk();
+    }
 }
